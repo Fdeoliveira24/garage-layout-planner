@@ -82,6 +82,15 @@ class App {
       this.itemManager.duplicateItem(itemId);
     });
 
+    this.eventBus.on('item:paste:requested', (itemData) => {
+      // Add pasted item with offset
+      const newItem = this.itemManager.addItem(itemData.itemId, itemData.left + 20, itemData.top + 20);
+      if (newItem && newItem.canvasObject) {
+        newItem.canvasObject.rotate(itemData.angle);
+        this.canvasManager.getCanvas().renderAll();
+      }
+    });
+
     // Floor plan events
     this.eventBus.on('floorplan:changed', () => {
       this.historyManager.save();
@@ -147,6 +156,18 @@ class App {
       if (ctrl && e.key === 'a') {
         e.preventDefault();
         this.selectionManager.selectAll();
+      }
+
+      // Ctrl+C - Copy
+      if (ctrl && e.key === 'c') {
+        e.preventDefault();
+        this.selectionManager.copySelected();
+      }
+
+      // Ctrl+V - Paste
+      if (ctrl && e.key === 'v') {
+        e.preventDefault();
+        this.selectionManager.pasteSelected();
       }
 
       // Esc - Deselect

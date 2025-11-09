@@ -108,12 +108,23 @@ body {
 .toolbar {
   background: var(--color-bg-panel);
   border-bottom: 1px solid var(--color-border);
-  padding: 8px 24px;
+  padding: 8px 16px;
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 48px;
+  min-height: 48px;
   flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.toolbar::-webkit-scrollbar {
+  height: 4px;
+}
+
+.toolbar::-webkit-scrollbar-thumb {
+  background: var(--color-border-hover);
+  border-radius: 2px;
 }
 
 .toolbar-group {
@@ -121,6 +132,11 @@ body {
   gap: 4px;
   padding: 0 8px;
   border-right: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.toolbar-group:first-child {
+  padding-left: 0;
 }
 
 .toolbar-group:last-child {

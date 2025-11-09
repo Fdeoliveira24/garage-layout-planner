@@ -8,6 +8,7 @@ class SelectionManager {
     this.eventBus = eventBus;
     this.canvasManager = canvasManager;
     this.canvas = canvasManager.getCanvas();
+    this.clipboard = null; // For copy/paste
   }
 
   /**
@@ -107,6 +108,42 @@ class SelectionManager {
       if (item.customData && item.customData.id) {
         this.eventBus.emit('item:duplicate:requested', item.customData.id);
       }
+    });
+  }
+
+  /**
+   * Copy selected items to clipboard
+   */
+  copySelected() {
+    const selected = this.getSelection();
+    if (selected.length === 0) return;
+
+    this.clipboard = selected.map(item => {
+      if (item.customData) {
+        return {
+          itemId: item.customData.itemId,
+          id: item.customData.id,
+          label: item.customData.label,
+          widthFt: item.customData.widthFt,
+          lengthFt: item.customData.lengthFt,
+          category: item.customData.category,
+          left: item.left,
+          top: item.top,
+          angle: item.angle || 0
+        };
+      }
+      return null;
+    }).filter(item => item !== null);
+  }
+
+  /**
+   * Paste items from clipboard
+   */
+  pasteSelected() {
+    if (!this.clipboard || this.clipboard.length === 0) return;
+
+    this.clipboard.forEach(item => {
+      this.eventBus.emit('item:paste:requested', item);
     });
   }
 
