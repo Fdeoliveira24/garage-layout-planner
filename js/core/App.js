@@ -200,9 +200,10 @@ class App {
     if (!container) return;
 
     const floorPlans = this.floorPlanManager.getAllFloorPlans();
+    const currentId = this.state.get('floorPlan')?.id;
     
     container.innerHTML = floorPlans.map(fp => `
-      <div class="floorplan-item" data-id="${fp.id}">
+      <div class="floorplan-item ${currentId === fp.id ? 'selected' : ''}" data-id="${fp.id}">
         <div class="floorplan-name">${fp.name}</div>
         <div class="floorplan-info">${fp.description}</div>
         <div class="floorplan-area">${fp.area} sq ft</div>
@@ -214,6 +215,8 @@ class App {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
         this.floorPlanManager.setFloorPlan(id);
+        // Refresh floor plan list to update selected state
+        this.renderFloorPlanList();
       });
     });
   }

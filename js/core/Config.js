@@ -50,10 +50,10 @@ const Config = {
   
   // Colors
   COLORS: {
-    floorPlan: '#f0f0f0',
-    floorPlanStroke: '#333333',
-    grid: '#e0e0e0',
-    entryZone: 'rgba(255, 200, 0, 0.1)',
+    floorPlan: '#ffffff',
+    floorPlanStroke: '#2c3e50',
+    grid: '#d0d0d0',
+    entryZone: 'rgba(255, 193, 7, 0.15)',
     entryZoneWarning: 'rgba(255, 0, 0, 0.2)',
     selection: '#2196F3',
     alignmentGuide: '#FF5722',

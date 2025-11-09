@@ -125,6 +125,9 @@ class CanvasManager {
     if (this.entryZoneRect) {
       this.canvas.remove(this.entryZoneRect);
     }
+    if (this.entryZoneLabel) {
+      this.canvas.remove(this.entryZoneLabel);
+    }
 
     const width = Helpers.feetToPx(floorPlan.widthFt);
     const height = Helpers.feetToPx(floorPlan.heightFt);
@@ -150,17 +153,35 @@ class CanvasManager {
       width: width,
       height: entryHeight,
       fill: Config.COLORS.entryZone,
-      stroke: '#FFC107',
-      strokeWidth: 1,
-      strokeDashArray: [5, 5],
+      stroke: '#FFA000',
+      strokeWidth: 2,
+      strokeDashArray: [8, 4],
       selectable: false,
       evented: false
+    });
+    
+    // Add entry zone label
+    this.entryZoneLabel = new fabric.Text('Entry Zone (Keep Clear)', {
+      left: width / 2,
+      top: height - entryHeight / 2,
+      fontSize: 14,
+      fill: '#F57C00',
+      fontWeight: 'bold',
+      originX: 'center',
+      originY: 'center',
+      selectable: false,
+      evented: false,
+      opacity: 0.7
     });
 
     this.canvas.add(this.floorPlanRect);
     this.canvas.add(this.entryZoneRect);
+    this.canvas.add(this.entryZoneLabel);
+    
+    // Send floor plan elements to back
     this.floorPlanRect.sendToBack();
-    this.entryZoneRect.sendToBack();
+    this.entryZoneRect.moveTo(1);
+    this.entryZoneLabel.moveTo(2);
 
     // Draw grid if enabled
     if (this.state.get('settings.showGrid')) {
@@ -187,26 +208,26 @@ class CanvasManager {
     for (let i = 0; i <= width; i += gridSize) {
       const line = new fabric.Line([i, 0, i, height], {
         stroke: Config.COLORS.grid,
-        strokeWidth: 1,
+        strokeWidth: i % 50 === 0 ? 1.5 : 0.5,
         selectable: false,
         evented: false
       });
       this.gridLines.push(line);
       this.canvas.add(line);
-      line.sendToBack();
+      line.moveTo(1);
     }
 
     // Horizontal lines
     for (let i = 0; i <= height; i += gridSize) {
       const line = new fabric.Line([0, i, width, i], {
         stroke: Config.COLORS.grid,
-        strokeWidth: 1,
+        strokeWidth: i % 50 === 0 ? 1.5 : 0.5,
         selectable: false,
         evented: false
       });
       this.gridLines.push(line);
       this.canvas.add(line);
-      line.sendToBack();
+      line.moveTo(1);
     }
   }
 
@@ -237,21 +258,30 @@ class CanvasManager {
     const width = Helpers.feetToPx(itemData.widthFt);
     const height = Helpers.feetToPx(itemData.lengthFt); // Vertical by default
 
+    // Center the item at the given position
     const rect = new fabric.Rect({
-      left: x,
-      top: y,
+      left: x - width / 2,
+      top: y - height / 2,
       width: width,
       height: height,
       fill: itemData.color || '#2196F3',
-      stroke: '#000000',
-      strokeWidth: 1,
-      angle: 0
+      stroke: '#333',
+      strokeWidth: 2,
+      angle: 0,
+      rx: 4,
+      ry: 4,
+      shadow: new fabric.Shadow({
+        color: 'rgba(0,0,0,0.3)',
+        blur: 10,
+        offsetX: 2,
+        offsetY: 2
+      })
     });
 
     // Store custom data
     rect.customData = {
       id: itemData.id,
-      itemId: itemData.id,
+      itemId: itemData.itemId || itemData.id,
       label: itemData.label,
       lengthFt: itemData.lengthFt,
       widthFt: itemData.widthFt,
@@ -261,14 +291,19 @@ class CanvasManager {
 
     // Add label
     const label = new fabric.Text(itemData.label, {
-      left: x + width / 2,
-      top: y + height / 2,
-      fontSize: 12,
+      left: x,
+      top: y,
+      fontSize: 11,
       fill: '#ffffff',
+      fontWeight: 'bold',
       originX: 'center',
       originY: 'center',
       selectable: false,
-      evented: false
+      evented: false,
+      shadow: new fabric.Shadow({
+        color: 'rgba(0,0,0,0.5)',
+        blur: 3
+      })
     });
 
     label.customData = { parentId: rect.customData.id, isLabel: true };
