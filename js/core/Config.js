@@ -28,7 +28,7 @@ const Config = {
   AUTOSAVE_INTERVAL: 30000, // 30 seconds
   
   // Entry Zone
-  ENTRY_ZONE_PERCENTAGE: 0.2, // Bottom 20%
+  ENTRY_ZONE_PERCENTAGE: 0.12, // Bottom 12%
   
   // Units
   UNITS: {
@@ -53,8 +53,8 @@ const Config = {
     floorPlan: '#ffffff',
     floorPlanStroke: '#2c3e50',
     grid: '#b0b0b0',
-    entryZone: 'rgba(255, 193, 7, 0.25)',
-    entryZoneWarning: 'rgba(255, 0, 0, 0.2)',
+    entryZone: 'rgba(255, 0, 0, 0.15)',
+    entryZoneWarning: 'rgba(255, 0, 0, 0.3)',
     selection: '#2196F3',
     alignmentGuide: '#FF5722',
     dimension: '#666666'

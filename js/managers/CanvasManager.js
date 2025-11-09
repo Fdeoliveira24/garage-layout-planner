@@ -62,11 +62,13 @@ class CanvasManager {
   setupEventListeners() {
     // Object moving
     this.canvas.on('object:moving', (e) => {
+      this.constrainToFloorPlan(e.target);
       this.eventBus.emit('canvas:object:moving', e.target);
     });
 
     // Object moved
     this.canvas.on('object:modified', (e) => {
+      this.constrainToFloorPlan(e.target);
       this.eventBus.emit('canvas:object:modified', e.target);
     });
 
@@ -89,6 +91,47 @@ class CanvasManager {
     this.canvas.on('mouse:wheel', (opt) => {
       this.handleMouseWheel(opt);
     });
+  }
+
+  /**
+   * Constrain object to floor plan bounds
+   */
+  constrainToFloorPlan(obj) {
+    if (!obj || !obj.customData || !this.floorPlanRect) return;
+
+    const bounds = obj.getBoundingRect();
+    const floorPlan = this.floorPlanRect;
+
+    let isOutOfBounds = false;
+
+    // Constrain left
+    if (bounds.left < floorPlan.left) {
+      obj.left = floorPlan.left + obj.getScaledWidth() / 2;
+      isOutOfBounds = true;
+    }
+
+    // Constrain top
+    if (bounds.top < floorPlan.top) {
+      obj.top = floorPlan.top + obj.getScaledHeight() / 2;
+      isOutOfBounds = true;
+    }
+
+    // Constrain right
+    if (bounds.left + bounds.width > floorPlan.left + floorPlan.width) {
+      obj.left = floorPlan.left + floorPlan.width - obj.getScaledWidth() / 2;
+      isOutOfBounds = true;
+    }
+
+    // Constrain bottom
+    if (bounds.top + bounds.height > floorPlan.top + floorPlan.height) {
+      obj.top = floorPlan.top + floorPlan.height - obj.getScaledHeight() / 2;
+      isOutOfBounds = true;
+    }
+
+    if (isOutOfBounds) {
+      obj.setCoords();
+      this.canvas.renderAll();
+    }
   }
 
   /**
@@ -153,7 +196,7 @@ class CanvasManager {
       width: width,
       height: entryHeight,
       fill: Config.COLORS.entryZone,
-      stroke: '#FFA000',
+      stroke: '#D32F2F',
       strokeWidth: 2,
       strokeDashArray: [8, 4],
       selectable: false,
@@ -161,17 +204,17 @@ class CanvasManager {
     });
     
     // Add entry zone label
-    this.entryZoneLabel = new fabric.Text('Entry Zone (Keep Clear)', {
+    this.entryZoneLabel = new fabric.Text('ENTRY ZONE', {
       left: width / 2,
       top: height - entryHeight / 2,
-      fontSize: 14,
-      fill: '#F57C00',
+      fontSize: 12,
+      fill: '#D32F2F',
       fontWeight: 'bold',
       originX: 'center',
       originY: 'center',
       selectable: false,
       evented: false,
-      opacity: 0.7
+      opacity: 0.8
     });
 
     this.canvas.add(this.floorPlanRect);
@@ -258,18 +301,42 @@ class CanvasManager {
     const width = Helpers.feetToPx(itemData.widthFt);
     const height = Helpers.feetToPx(itemData.lengthFt); // Vertical by default
 
-    // Center the item at the given position
+    // Create rectangle
     const rect = new fabric.Rect({
-      left: x - width / 2,
-      top: y - height / 2,
+      left: -width / 2,
+      top: -height / 2,
       width: width,
       height: height,
       fill: itemData.color || '#2196F3',
       stroke: '#333',
       strokeWidth: 2,
-      angle: 0,
       rx: 4,
       ry: 4,
+      originX: 'left',
+      originY: 'top'
+    });
+
+    // Create label
+    const label = new fabric.Text(itemData.label, {
+      left: 0,
+      top: 0,
+      fontSize: 11,
+      fill: '#ffffff',
+      fontWeight: 'bold',
+      originX: 'center',
+      originY: 'center',
+      shadow: new fabric.Shadow({
+        color: 'rgba(0,0,0,0.5)',
+        blur: 3
+      })
+    });
+
+    // Group rectangle and label together
+    const group = new fabric.Group([rect, label], {
+      left: x,
+      top: y,
+      originX: 'center',
+      originY: 'center',
       shadow: new fabric.Shadow({
         color: 'rgba(0,0,0,0.3)',
         blur: 10,
@@ -278,8 +345,8 @@ class CanvasManager {
       })
     });
 
-    // Store custom data
-    rect.customData = {
+    // Store custom data on group
+    group.customData = {
       id: itemData.id,
       itemId: itemData.itemId || itemData.id,
       label: itemData.label,
@@ -289,29 +356,9 @@ class CanvasManager {
       locked: false
     };
 
-    // Add label
-    const label = new fabric.Text(itemData.label, {
-      left: x,
-      top: y,
-      fontSize: 11,
-      fill: '#ffffff',
-      fontWeight: 'bold',
-      originX: 'center',
-      originY: 'center',
-      selectable: false,
-      evented: false,
-      shadow: new fabric.Shadow({
-        color: 'rgba(0,0,0,0.5)',
-        blur: 3
-      })
-    });
+    this.canvas.add(group);
 
-    label.customData = { parentId: rect.customData.id, isLabel: true };
-
-    this.canvas.add(rect);
-    this.canvas.add(label);
-
-    return { rect, label };
+    return group;
   }
 
   /**

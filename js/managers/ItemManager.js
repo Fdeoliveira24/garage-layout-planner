@@ -30,11 +30,10 @@ class ItemManager {
     };
 
     // Add to canvas
-    const canvasObjects = this.canvasManager.addItem(itemData, x, y);
+    const canvasGroup = this.canvasManager.addItem(itemData, x, y);
 
-    // Store reference to canvas object
-    itemData.canvasObject = canvasObjects.rect;
-    itemData.labelObject = canvasObjects.label;
+    // Store reference to canvas object (now a group)
+    itemData.canvasObject = canvasGroup;
 
     // Add to state
     const items = this.state.get('items') || [];
@@ -59,9 +58,6 @@ class ItemManager {
     // Remove from canvas
     if (item.canvasObject) {
       this.canvasManager.removeItem(item.canvasObject);
-    }
-    if (item.labelObject) {
-      this.canvasManager.removeItem(item.labelObject);
     }
 
     // Remove from state
@@ -115,12 +111,27 @@ class ItemManager {
     const item = this.getItem(itemId);
     if (!item) return null;
 
+    // Get current position from canvas object if available
+    let x = item.x + 20;
+    let y = item.y + 20;
+    let angle = item.angle || 0;
+
+    if (item.canvasObject) {
+      x = item.canvasObject.left + 20;
+      y = item.canvasObject.top + 20;
+      angle = item.canvasObject.angle || 0;
+    }
+
     // Create duplicate with offset
-    return this.addItem(
-      item.itemId,
-      item.x + 20,
-      item.y + 20
-    );
+    const newItem = this.addItem(item.itemId, x, y);
+    
+    // Copy rotation
+    if (newItem && newItem.canvasObject && angle !== 0) {
+      newItem.canvasObject.rotate(angle);
+      this.canvasManager.getCanvas().renderAll();
+    }
+
+    return newItem;
   }
 
   /**

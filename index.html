@@ -127,14 +127,6 @@
         <!-- Canvas -->
         <div class="canvas-wrapper">
           <canvas id="canvas"></canvas>
-          <div class="canvas-controls">
-            <button id="btn-zoom-in-2" class="btn btn-icon" title="Zoom In">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M12,10H10V12H9V10H7V9H9V7H10V9H12V10Z"/></svg>
-            </button>
-            <button id="btn-zoom-out-2" class="btn btn-icon" title="Zoom Out">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M7,9H12V10H7V9Z"/></svg>
-            </button>
-          </div>
         </div>
       </div>
 
@@ -168,6 +160,9 @@
   <script src="js/utils/geometry.js"></script>
   <script src="js/utils/validation.js"></script>
 
+  <!-- UI -->
+  <script src="js/ui/Modal.js"></script>
+
   <!-- Managers -->
   <script src="js/managers/HistoryManager.js"></script>
   <script src="js/managers/CanvasManager.js"></script>
@@ -198,14 +193,6 @@
           document.getElementById('items-tab').classList.remove('hidden');
         }
       });
-    });
-
-    // Duplicate zoom button handlers
-    document.getElementById('btn-zoom-in-2')?.addEventListener('click', () => {
-      document.getElementById('btn-zoom-in').click();
-    });
-    document.getElementById('btn-zoom-out-2')?.addEventListener('click', () => {
-      document.getElementById('btn-zoom-out').click();
     });
 
     // Initialize app

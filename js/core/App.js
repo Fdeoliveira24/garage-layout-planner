@@ -451,8 +451,8 @@ class App {
   /**
    * Save layout
    */
-  saveLayout() {
-    const name = prompt('Enter layout name:');
+  async saveLayout() {
+    const name = await Modal.showPrompt('Save Layout', 'Enter layout name:');
     if (!name) return;
 
     const state = this.state.getState();
@@ -467,7 +467,7 @@ class App {
     });
 
     Storage.save(Config.STORAGE_KEYS.layouts, layouts);
-    alert('Layout saved successfully!');
+    Modal.showSuccess('Layout saved successfully!');
   }
 }
 
