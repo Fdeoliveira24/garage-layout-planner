@@ -114,8 +114,8 @@ body {
   gap: 8px;
   min-height: 48px;
   flex-shrink: 0;
-  overflow-x: auto;
-  overflow-y: visible; /* Allow tooltips to show below toolbar */
+  overflow-y: visible; /* Allow dropdown to show below */
+  overflow-x: visible; /* Don't clip horizontally either */
 }
 
 .toolbar::-webkit-scrollbar {
