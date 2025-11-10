@@ -330,6 +330,25 @@ class App {
    * Setup toolbar handlers
    */
   setupToolbarHandlers() {
+    // New layout
+    const newBtn = document.getElementById('btn-new');
+    if (newBtn) {
+      newBtn.addEventListener('click', async () => {
+        const confirmed = await Modal.showConfirm(
+          'Start New Layout?',
+          'Any unsaved changes will be lost. Are you sure?'
+        );
+        if (confirmed) {
+          this.state.reset();
+          this.canvasManager.clear();
+          this.canvasManager.showEmptyState();
+          this.renderFloorPlanList();
+          this.updateInfoPanel();
+          Modal.showSuccess('New layout started');
+        }
+      });
+    }
+
     // Undo
     const undoBtn = document.getElementById('btn-undo');
     if (undoBtn) {

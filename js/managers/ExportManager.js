@@ -84,16 +84,29 @@ class ExportManager {
    * Export as PDF
    */
   async exportPDF(options = {}) {
-    if (typeof jsPDF === 'undefined') {
+    // Check if jsPDF is loaded (it's in window.jspdf.jsPDF)
+    if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
       console.error('jsPDF library not loaded');
+      Modal.showError('PDF library not loaded. Please refresh the page.');
       return;
     }
+
+    // Use correct jsPDF reference
+    const { jsPDF } = window.jspdf || window;
+
+    console.log('Generating PDF...');
 
     // Get canvas image
     const imgData = this.canvasManager.toDataURL({
       multiplier: 2,
       format: 'png'
     });
+
+    if (!imgData || imgData.length < 100) {
+      console.error('Failed to generate canvas image for PDF');
+      Modal.showError('Failed to generate PDF');
+      return;
+    }
 
     // Create PDF
     const pdf = new jsPDF({
@@ -181,6 +194,7 @@ class ExportManager {
     const filename = `${this.state.get('metadata.projectName') || 'layout'}.pdf`;
     pdf.save(filename);
 
+    Modal.showSuccess('PDF exported successfully!');
     this.eventBus.emit('export:pdf:complete', filename);
     
     return pdf;
