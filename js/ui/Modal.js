@@ -2,6 +2,56 @@
  * Modal and Toast UI System
  */
 class Modal {
+  static showConfirm(title, message) {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.style.display = 'flex';
+      
+      const modal = document.createElement('div');
+      modal.className = 'modal';
+      modal.innerHTML = `
+        <div class="modal-header">
+          <h3 class="modal-title">${title}</h3>
+        </div>
+        <div class="modal-body">
+          <p>${message}</p>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-secondary" data-action="cancel">Cancel</button>
+          <button class="modal-btn modal-btn-primary" data-action="confirm">Confirm</button>
+        </div>
+      `;
+      
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+      
+      const handleClose = (confirmed) => {
+        overlay.remove();
+        resolve(confirmed);
+      };
+      
+      modal.querySelector('[data-action="confirm"]').addEventListener('click', () => {
+        handleClose(true);
+      });
+      
+      modal.querySelector('[data-action="cancel"]').addEventListener('click', () => {
+        handleClose(false);
+      });
+      
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) handleClose(false);
+      });
+      
+      document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+          handleClose(false);
+          document.removeEventListener('keydown', escHandler);
+        }
+      });
+    });
+  }
+
   static showPrompt(title, message, defaultValue = '') {
     return new Promise((resolve) => {
       const overlay = document.createElement('div');
