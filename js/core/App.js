@@ -317,7 +317,7 @@ class App {
         const floorPlan = this.state.get('floorPlan');
         
         if (!floorPlan) {
-          alert('Please select a floor plan first');
+          Modal.showInfo('Please select a floor plan first');
           return;
         }
 

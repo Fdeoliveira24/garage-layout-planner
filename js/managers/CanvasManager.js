@@ -32,20 +32,17 @@ class CanvasManager {
       preserveObjectStacking: true
     });
 
-    // Set canvas size
-    this.resizeCanvas();
-
     // Setup event listeners
     this.setupEventListeners();
 
     // Listen to window resize
     window.addEventListener('resize', () => this.resizeCanvas());
 
-    // Show empty state after DOM layout is complete
-    requestAnimationFrame(() => {
+    // Ensure canvas is properly sized and show empty state after DOM is fully laid out
+    setTimeout(() => {
       this.resizeCanvas();
       this.showEmptyState();
-    });
+    }, 100);
 
     return this.canvas;
   }
@@ -57,10 +54,19 @@ class CanvasManager {
     if (!this.canvas) return;
 
     const container = this.canvas.wrapperEl.parentElement;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+    const width = container.clientWidth || 800;
+    const height = container.clientHeight || 600;
 
     this.canvas.setDimensions({ width, height });
+    
+    // Re-center empty state if it exists
+    if (this.emptyStateGroup) {
+      this.emptyStateGroup.set({
+        left: width / 2,
+        top: height / 2
+      });
+    }
+    
     this.canvas.renderAll();
   }
 
