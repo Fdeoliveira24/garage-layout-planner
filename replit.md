@@ -21,6 +21,8 @@ A professional, browser-based garage and storage layout planning tool built enti
 
 **UI Improvements:**
 - **New Button** - Added "+ New" button to toolbar for starting fresh layouts with confirmation
+- **Saved Layouts Tab** - New "Saved" tab in sidebar displays all saved layouts with Load/Delete actions
+- **Save/Load System** - Full save/load functionality for managing multiple named layouts in localStorage
 - **Export Debugging** - PNG/PDF exports include console logging and validation checks
 - **Empty State** - Prominent canvas center message when no floor plan selected
 - **Z-Index Fixes** - Dropdown menus properly appear above canvas

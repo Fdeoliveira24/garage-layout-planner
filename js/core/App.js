@@ -238,6 +238,7 @@ class App {
         // Hide all tab contents
         document.getElementById('floorplan-tab').classList.add('hidden');
         document.getElementById('items-tab').classList.add('hidden');
+        document.getElementById('saved-tab').classList.add('hidden');
         
         // Show selected tab content
         const tabName = tab.dataset.tab;
@@ -245,6 +246,9 @@ class App {
           document.getElementById('floorplan-tab').classList.remove('hidden');
         } else if (tabName === 'items') {
           document.getElementById('items-tab').classList.remove('hidden');
+        } else if (tabName === 'saved') {
+          document.getElementById('saved-tab').classList.remove('hidden');
+          this.renderSavedLayouts();
         }
       });
     });
@@ -600,6 +604,106 @@ class App {
 
     Storage.save(Config.STORAGE_KEYS.layouts, layouts);
     Modal.showSuccess('Layout saved successfully!');
+    
+    this.renderSavedLayouts();
+  }
+
+  /**
+   * Render saved layouts list
+   */
+  renderSavedLayouts() {
+    const container = document.getElementById('saved-layouts-list');
+    if (!container) return;
+
+    const layouts = Storage.load(Config.STORAGE_KEYS.layouts) || [];
+    
+    if (layouts.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <p>No saved layouts</p>
+          <p style="font-size: 12px; margin-top: 8px;">Click the Save button to save your current layout</p>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = layouts.map(layout => `
+      <div class="saved-layout-item" data-id="${layout.id}">
+        <div class="saved-layout-name">${layout.name}</div>
+        <div class="saved-layout-date">${new Date(layout.created).toLocaleDateString()}</div>
+        <div class="saved-layout-actions">
+          <button class="btn-load-layout" data-id="${layout.id}">Load</button>
+          <button class="btn-delete-layout" data-id="${layout.id}">Delete</button>
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('.btn-load-layout').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.loadLayout(btn.dataset.id);
+      });
+    });
+
+    container.querySelectorAll('.btn-delete-layout').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const confirmed = await Modal.showConfirm(
+          'Delete Layout?',
+          'Are you sure you want to delete this layout? This cannot be undone.'
+        );
+        if (confirmed) {
+          this.deleteLayout(btn.dataset.id);
+        }
+      });
+    });
+  }
+
+  /**
+   * Load a saved layout
+   */
+  async loadLayout(layoutId) {
+    const layouts = Storage.load(Config.STORAGE_KEYS.layouts) || [];
+    const layout = layouts.find(l => l.id === layoutId);
+    
+    if (!layout) {
+      Modal.showError('Layout not found');
+      return;
+    }
+
+    const confirmed = await Modal.showConfirm(
+      'Load Layout?',
+      'This will replace your current layout. Any unsaved changes will be lost.'
+    );
+    
+    if (!confirmed) return;
+
+    this.state.loadState(layout.state);
+    
+    if (layout.state.floorPlan) {
+      this.floorPlanManager.setFloorPlan(layout.state.floorPlan.id);
+      
+      const items = layout.state.items || [];
+      items.forEach(item => {
+        this.itemManager.addItemFromState(item);
+      });
+    }
+
+    this.renderFloorPlanList();
+    this.updateInfoPanel();
+    Modal.showSuccess('Layout loaded successfully!');
+  }
+
+  /**
+   * Delete a saved layout
+   */
+  deleteLayout(layoutId) {
+    let layouts = Storage.load(Config.STORAGE_KEYS.layouts) || [];
+    layouts = layouts.filter(l => l.id !== layoutId);
+    Storage.save(Config.STORAGE_KEYS.layouts, layouts);
+    
+    this.renderSavedLayouts();
+    Modal.showSuccess('Layout deleted');
   }
 }
 
