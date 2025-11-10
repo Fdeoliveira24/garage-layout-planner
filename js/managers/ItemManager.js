@@ -19,10 +19,11 @@ class ItemManager {
       return null;
     }
 
-    // Create unique item data
+    // Create unique item data - preserve template id as itemId
     const itemData = {
       ...itemTemplate,
-      id: Helpers.generateId('item'),
+      itemId: itemTemplate.id, // Preserve template ID for re-instantiation
+      id: Helpers.generateId('item'), // Unique instance ID
       x: x,
       y: y,
       angle: 0,

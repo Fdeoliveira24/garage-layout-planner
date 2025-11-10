@@ -348,13 +348,16 @@ class CanvasManager {
       originY: 'center',
       selectable: true,
       evented: true,
-      hasControls: false,
+      hasControls: true,
       hasBorders: true,
       lockScalingX: true,
       lockScalingY: true,
+      lockSkewingX: true,
+      lockSkewingY: true,
       borderColor: '#6366F1',
       borderScaleFactor: 2,
       cornerColor: '#6366F1',
+      cornerSize: 12,
       transparentCorners: false,
       shadow: new fabric.Shadow({
         color: 'rgba(0,0,0,0.3)',
@@ -362,6 +365,19 @@ class CanvasManager {
         offsetX: 2,
         offsetY: 2
       })
+    });
+
+    // Hide all control handles EXCEPT rotation (mtr)
+    group.setControlsVisibility({
+      mt: false,   // middle top
+      mb: false,   // middle bottom
+      ml: false,   // middle left
+      mr: false,   // middle right
+      bl: false,   // bottom left
+      br: false,   // bottom right
+      tl: false,   // top left
+      tr: false,   // top right
+      mtr: true    // rotation handle - KEEP VISIBLE
     });
 
     // Store custom data on group
