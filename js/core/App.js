@@ -436,7 +436,7 @@ class App {
   }
 
   /**
-   * Update info panel
+   * Update info panel - Inline horizontal format
    */
   updateInfoPanel() {
     const panel = document.getElementById('info-panel');
@@ -446,35 +446,59 @@ class App {
     const items = this.state.get('items') || [];
     const selection = this.selectionManager.getSelection();
 
-    let html = '<div class="info-section">';
+    const segments = [];
 
     if (floorPlan) {
-      html += `
-        <h3>Floor Plan</h3>
-        <div>${floorPlan.name}</div>
-        <div>${floorPlan.widthFt}' × ${floorPlan.heightFt}'</div>
-        <div>${floorPlan.area} sq ft</div>
-        <div>Items: ${items.length}</div>
-      `;
-    } else {
-      html += '<div class="empty-state">Select a floor plan to begin</div>';
-    }
+      segments.push(`
+        <div class="info-bar__segment">
+          <span class="info-bar__label">Floor:</span>
+          <span class="info-bar__value">${floorPlan.widthFt}' × ${floorPlan.heightFt}' (${floorPlan.area} sq ft)</span>
+        </div>
+      `);
 
-    html += '</div>';
+      segments.push(`
+        <div class="info-bar__segment">
+          <span class="info-bar__label">Items:</span>
+          <span class="info-bar__value">${items.length}</span>
+        </div>
+      `);
+    } else {
+      segments.push('<div class="info-bar__placeholder">Select a floor plan to begin</div>');
+    }
 
     if (selection.length > 0) {
       const item = selection[0];
-      html += `
-        <div class="info-section">
-          <h3>Selected Item</h3>
-          <div>${item.customData?.label || 'Unknown'}</div>
-          <div>Position: ${Math.round(item.left)}, ${Math.round(item.top)}</div>
-          <div>Angle: ${Math.round(item.angle || 0)}°</div>
+      const itemData = item.customData || {};
+      
+      segments.push(`
+        <div class="info-bar__segment">
+          <span class="info-bar__label">Selected:</span>
+          <span class="info-bar__value">${itemData.label || 'Unknown'}</span>
         </div>
-      `;
+      `);
+
+      if (itemData.lengthFt && itemData.widthFt) {
+        segments.push(`
+          <div class="info-bar__segment">
+            <span class="info-bar__label">Size:</span>
+            <span class="info-bar__value">${itemData.lengthFt}' × ${itemData.widthFt}'</span>
+          </div>
+        `);
+      }
+
+      const posX = ((item.left - (floorPlan?.canvasBounds?.left || 0)) / 10).toFixed(1);
+      const posY = ((item.top - (floorPlan?.canvasBounds?.top || 0)) / 10).toFixed(1);
+      
+      segments.push(`
+        <div class="info-bar__segment">
+          <span class="info-bar__label">Position:</span>
+          <span class="info-bar__value">${posX}' from left, ${posY}' from top</span>
+        </div>
+      `);
     }
 
-    panel.innerHTML = html;
+    const divider = '<span class="info-bar__divider"></span>';
+    panel.innerHTML = segments.join(divider);
   }
 
   /**
