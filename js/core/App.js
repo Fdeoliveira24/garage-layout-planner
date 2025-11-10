@@ -59,7 +59,12 @@ class App {
    */
   setupEventListeners() {
     // Canvas events
-    this.eventBus.on('canvas:object:modified', () => {
+    this.eventBus.on('canvas:object:modified', (obj) => {
+      // Update item position in state when moved
+      if (obj && obj.customData && obj.customData.id) {
+        const center = obj.getCenterPoint();
+        this.updateItemPosition(obj.customData.id, center.x, center.y, obj.angle || 0);
+      }
       this.historyManager.save();
     });
 
@@ -461,6 +466,7 @@ class App {
    */
   autosave() {
     const state = this.state.getState();
+    state.version = '2.0'; // Mark version for compatibility check
     Storage.save(Config.STORAGE_KEYS.autosave, state);
   }
 
@@ -469,6 +475,17 @@ class App {
    */
   loadAutosave() {
     const savedState = Storage.load(Config.STORAGE_KEYS.autosave);
+    
+    // Check version and clear if incompatible
+    const APP_VERSION = '2.0'; // Updated coordinate system
+    console.log('Saved version:', savedState ? savedState.version : 'none', 'Current version:', APP_VERSION);
+    
+    if (savedState && savedState.version !== APP_VERSION) {
+      console.log('Incompatible version detected, clearing autosave...');
+      Storage.remove(Config.STORAGE_KEYS.autosave);
+      return;
+    }
+    
     if (savedState && savedState.floorPlan) {
       console.log('Autosave found, loading...');
       this.state.loadState(savedState);
@@ -493,6 +510,20 @@ class App {
         
         this.canvasManager.getCanvas().renderAll();
       }
+    }
+  }
+
+  /**
+   * Update item position in state after drag
+   */
+  updateItemPosition(itemId, x, y, angle) {
+    const items = this.state.get('items') || [];
+    const item = items.find(i => i.id === itemId);
+    if (item) {
+      item.x = x;
+      item.y = y;
+      item.angle = angle;
+      this.state.setState({ items });
     }
   }
 
