@@ -6,6 +6,15 @@ A professional, browser-based garage and storage layout planning tool built enti
 
 ## Recent Changes (Nov 10, 2025)
 
+**UX Improvements - Entry Zone & Zoom (v2.6.0):**
+- **Entry Zone Label Rotation** - "ENTRY ZONE" text now rotates 90° when positioned on left or right sides for better readability
+- **Item Wall Collision Fix** - Items can now touch walls properly; boundary detection uses actual rectangle dimensions instead of bounding box with label text
+- **Zoom Dropdown** - Replaced three separate zoom buttons with modern dropdown showing current zoom percentage (e.g., "100%")
+  - Zoom In/Out buttons inside dropdown
+  - "Fit to Screen" button (better icon than previous square corners)
+  - Percentage updates in real-time for all zoom operations (wheel, buttons, fit-to-screen)
+- **Zoom Event Synchronization** - All zoom pathways (mouse wheel, toolbar buttons, fit-to-screen, auto-fit) now emit zoom events to keep UI synchronized
+
 **Enhanced Entry Zone Controls (v2.5.0):**
 - **Entry Zone Border Toggle** - Show/hide the red dotted border around entry zone (visible by default)
 - **4-Position Entry Zone** - Position entry zone on any side: top, bottom, left, or right (defaults to bottom)
