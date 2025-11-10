@@ -93,15 +93,27 @@
 
           <!-- Zoom -->
           <div class="toolbar-group">
-            <button id="btn-zoom-in" class="btn btn-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M12,10H10V12H9V10H7V9H9V7H10V9H12V10Z"/></svg>
-            </button>
-            <button id="btn-zoom-out" class="btn btn-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M7,9H12V10H7V9Z"/></svg>
-            </button>
-            <button id="btn-zoom-reset" class="btn btn-icon">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z"/></svg>
-            </button>
+            <div class="dropdown">
+              <button id="btn-zoom" class="btn">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14Z"/></svg>
+                <span id="zoom-percentage">100%</span>
+                <svg viewBox="0 0 24 24" fill="currentColor" style="width:14px;height:14px;margin-left:4px;"><path d="M7,10L12,15L17,10H7Z"/></svg>
+              </button>
+              <div class="dropdown-menu">
+                <button id="btn-zoom-in" class="dropdown-item">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M12,10H10V12H9V10H7V9H9V7H10V9H12V10Z"/></svg>
+                  Zoom In
+                </button>
+                <button id="btn-zoom-out" class="dropdown-item">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5,14H14.71L14.43,13.73C15.41,12.59 16,11.11 16,9.5A6.5,6.5 0 0,0 9.5,3A6.5,6.5 0 0,0 3,9.5A6.5,6.5 0 0,0 9.5,16C11.11,16 12.59,15.41 13.73,14.43L14,14.71V15.5L19,20.5L20.5,19L15.5,14M9.5,14C7,14 5,12 5,9.5C5,7 7,5 9.5,5C12,5 14,7 14,9.5C14,12 12,14 9.5,14M7,9H12V10H7V9Z"/></svg>
+                  Zoom Out
+                </button>
+                <button id="btn-zoom-reset" class="dropdown-item">
+                  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4,4H7V2H9V4H11V6H9V8H7V6H4V4M4,18H7V16H9V18H11V20H9V22H7V20H4V18M20,18H17V16H15V18H13V20H15V22H17V20H20V18M20,4H17V2H15V4H13V6H15V8H17V6H20V4M11,8V10H13V8H11M11,10V12H9V14H7V12H9V10H11M7,12V14H5V12H7M5,12V10H3V12H5M19,12V14H17V12H19M17,12V10H15V12H17M15,10V8H13V10H15M19,10V12H21V10H19Z"/></svg>
+                  Fit to Screen
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- View -->
@@ -261,6 +273,14 @@
 
     // Export dropdown toggle
     document.getElementById('btn-export')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const dropdown = e.target.closest('.dropdown');
+      const menu = dropdown.querySelector('.dropdown-menu');
+      menu.classList.toggle('show');
+    });
+
+    // Zoom dropdown toggle
+    document.getElementById('btn-zoom')?.addEventListener('click', (e) => {
       e.stopPropagation();
       const dropdown = e.target.closest('.dropdown');
       const menu = dropdown.querySelector('.dropdown-menu');

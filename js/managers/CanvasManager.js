@@ -110,20 +110,29 @@ class CanvasManager {
   /**
    * Constrain object to floor plan bounds
    * Objects use center origin, so left/top represent center coordinates
+   * Uses actual item rectangle dimensions (not group bounding box with label)
    */
   constrainToFloorPlan(obj) {
     if (!obj || !obj.customData || !this.floorPlanRect) return;
 
-    const bounds = obj.getBoundingRect();
     const floorPlan = this.floorPlanRect;
-
     let isOutOfBounds = false;
 
     // Get center position (obj.left/top are already center due to originX/Y: 'center')
     const centerX = obj.left;
     const centerY = obj.top;
-    const halfWidth = obj.getScaledWidth() / 2;
-    const halfHeight = obj.getScaledHeight() / 2;
+    
+    // Use actual item rectangle dimensions from customData (not group bounding box)
+    // This prevents label text from affecting boundary calculations
+    const itemWidth = Helpers.feetToPx(obj.customData.widthFt);
+    const itemHeight = Helpers.feetToPx(obj.customData.lengthFt);
+    
+    // Calculate rotated bounding box dimensions
+    const angle = (obj.angle || 0) * Math.PI / 180;
+    const cos = Math.abs(Math.cos(angle));
+    const sin = Math.abs(Math.sin(angle));
+    const halfWidth = (itemWidth * cos + itemHeight * sin) / 2;
+    const halfHeight = (itemWidth * sin + itemHeight * cos) / 2;
 
     let newX = centerX;
     let newY = centerY;
@@ -336,7 +345,9 @@ class CanvasManager {
       opacity: showEntryBorder ? 1 : 0
     });
     
-    // Add entry zone label
+    // Add entry zone label with rotation for vertical positions
+    const labelAngle = (entryZonePosition === 'left' || entryZonePosition === 'right') ? 90 : 0;
+    
     this.entryZoneLabel = new fabric.Text('ENTRY ZONE', {
       left: labelLeft,
       top: labelTop,
@@ -345,6 +356,7 @@ class CanvasManager {
       fontWeight: 'bold',
       originX: 'center',
       originY: 'center',
+      angle: labelAngle,
       selectable: false,
       evented: false,
       opacity: showEntryLabel ? 0.8 : 0
@@ -429,6 +441,9 @@ class CanvasManager {
     const offsetY = (canvasHeight - height * scale) / 2;
 
     this.canvas.absolutePan({ x: -offsetX / scale, y: -offsetY / scale });
+    
+    // Emit zoom event to update UI
+    this.eventBus.emit('canvas:zoomed', scale);
   }
 
   /**

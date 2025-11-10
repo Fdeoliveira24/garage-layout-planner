@@ -122,6 +122,11 @@ class App {
     this.eventBus.on('history:redo', () => {
       this.refreshCanvas();
     });
+
+    // Zoom events
+    this.eventBus.on('canvas:zoomed', (zoom) => {
+      this.updateZoomDisplay(zoom);
+    });
   }
 
   /**
@@ -626,6 +631,16 @@ class App {
 
     const divider = '<span class="info-bar__divider"></span>';
     panel.innerHTML = segments.join(divider);
+  }
+
+  /**
+   * Update zoom percentage display in toolbar
+   */
+  updateZoomDisplay(zoom) {
+    const zoomPercentage = document.getElementById('zoom-percentage');
+    if (zoomPercentage) {
+      zoomPercentage.textContent = `${Math.round(zoom * 100)}%`;
+    }
   }
 
   /**
