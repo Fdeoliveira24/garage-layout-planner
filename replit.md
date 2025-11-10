@@ -6,13 +6,18 @@ A professional, browser-based garage and storage layout planning tool built enti
 
 ## Recent Changes (Nov 10, 2025)
 
+**Info Panel Repositioned & Empty State Fixed (v2.3.1):**
+- **Info Bar Below Canvas** - Moved info bar to appear below the canvas area (not below toolbar as initially implemented)
+- **Empty State Centering** - Fixed "Start Planning Your Space" text positioning with requestAnimationFrame delay for proper DOM layout
+- **Canvas Clear Bug** - Fixed emptyStateGroup reference not being nulled in clear() method, preventing stale object issues
+- **Text Cutoff Fix** - Empty state text no longer gets cut off on first load or after clicking +New
+
 **Info Panel Redesign (v2.3.0):**
-- **Inline Horizontal Layout** - Moved info panel from disruptive right sidebar to compact horizontal bar below toolbar
+- **Inline Horizontal Layout** - Moved info panel from disruptive right sidebar to compact horizontal bar
 - **Modern Format** - Shows data in single line: "Floor: 24' × 40' | Items: 3 | Selected: Pickup Truck | Size: 6.7' × 19.2' | Position: 3.0' from left, 7.0' from top"
 - **Segment-Based Design** - Uses flex layout with labeled segments separated by vertical dividers for clean visual hierarchy
 - **Responsive Wrapping** - Info bar wraps on narrow screens (≤768px) with proper spacing
 - **Canvas Space** - Removed right sidebar to maximize canvas workspace, matching Figma/Canva aesthetics
-- **Cache-Busting** - Updated version to v=2.3.0 to force browser refresh
 
 **Bug Fixes (Earlier Today):**
 - **Export Filenames** - PNG/PDF exports now use consistent format: "ProjectName_YYYY-MM-DD.png/pdf"
