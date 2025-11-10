@@ -6,6 +6,13 @@ A professional, browser-based garage and storage layout planning tool built enti
 
 ## Recent Changes (Nov 10, 2025)
 
+**Bug Fixes (Latest):**
+- **Export Filenames** - PNG/PDF exports now use consistent format: "ProjectName_YYYY-MM-DD.png/pdf"
+- **Load/Delete Buttons** - Fixed Saved Layouts tab Load/Delete functionality to properly restore layouts
+- **Empty State Centering** - Empty state message now properly centers after using +New button
+- **Zoom to Center** - Zoom In/Out now correctly zoom toward canvas center instead of drifting right
+- **Cache-Busting** - Added version parameters (v=2.2.1) to force browser refresh after updates
+
 **PDF Export - Print-Ready (300 DPI):**
 - **Professional Output** - Generates print-ready PDFs with 300 DPI resolution (3x multiplier)
 - **Smart Paper Selection** - Auto-selects paper size based on floor plan physical dimensions:
