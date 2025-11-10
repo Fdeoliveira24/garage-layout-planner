@@ -239,16 +239,37 @@ class App {
       gridToggleText.textContent = showGrid ? 'Hide Grid' : 'Show Grid';
     }
 
-    // Update entry zone position segmented control active state
+    // Update entry zone position buttons visibility
     const entryZonePosition = this.state.get('settings.entryZonePosition') || 'bottom';
-    const positionButtons = document.querySelectorAll('.segmented-button[data-position]');
-    positionButtons.forEach(btn => {
-      if (btn.dataset.position === entryZonePosition) {
-        btn.classList.add('is-active');
-      } else {
-        btn.classList.remove('is-active');
-      }
-    });
+    const entryZoneTopBtn = document.getElementById('btn-entry-zone-top');
+    const entryZoneBottomBtn = document.getElementById('btn-entry-zone-bottom');
+    const entryZoneLeftBtn = document.getElementById('btn-entry-zone-left');
+    const entryZoneRightBtn = document.getElementById('btn-entry-zone-right');
+    
+    // Hide all position buttons first
+    if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'none';
+    if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'none';
+    if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'none';
+    if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'none';
+    
+    // Show only the buttons for OTHER positions
+    if (entryZonePosition === 'top') {
+      if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'block';
+      if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'block';
+      if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'block';
+    } else if (entryZonePosition === 'bottom') {
+      if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'block';
+      if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'block';
+      if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'block';
+    } else if (entryZonePosition === 'left') {
+      if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'block';
+      if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'block';
+      if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'block';
+    } else if (entryZonePosition === 'right') {
+      if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'block';
+      if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'block';
+      if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'block';
+    }
 
     // Update entry label toggle text
     const showEntryLabel = this.state.get('settings.showEntryZoneLabel') !== false;
@@ -451,14 +472,15 @@ class App {
     }
 
     // Zoom controls
-    const zoomInBtn = document.getElementById('btn-zoom-in');
-    if (zoomInBtn) {
-      zoomInBtn.addEventListener('click', () => this.canvasManager.zoomIn());
-    }
-
-    const zoomOutBtn = document.getElementById('btn-zoom-out');
-    if (zoomOutBtn) {
-      zoomOutBtn.addEventListener('click', () => this.canvasManager.zoomOut());
+    const zoomSlider = document.getElementById('zoom-slider');
+    const zoomSliderValue = document.getElementById('zoom-slider-value');
+    
+    if (zoomSlider && zoomSliderValue) {
+      zoomSlider.addEventListener('input', (e) => {
+        const zoomPercent = parseInt(e.target.value);
+        zoomSliderValue.textContent = `${zoomPercent}%`;
+        this.canvasManager.setZoomPercent(zoomPercent);
+      });
     }
 
     const zoomResetBtn = document.getElementById('btn-zoom-reset');
@@ -616,9 +638,23 @@ class App {
    * Update zoom percentage display in toolbar
    */
   updateZoomDisplay(zoom) {
+    let zoomPercent = Math.round(zoom * 100);
+    
     const zoomPercentage = document.getElementById('zoom-percentage');
     if (zoomPercentage) {
-      zoomPercentage.textContent = `${Math.round(zoom * 100)}%`;
+      zoomPercentage.textContent = `${zoomPercent}%`;
+    }
+    
+    // Clamp slider value to 10-200% range
+    const clampedPercent = Math.max(10, Math.min(200, zoomPercent));
+    
+    const zoomSlider = document.getElementById('zoom-slider');
+    const zoomSliderValue = document.getElementById('zoom-slider-value');
+    if (zoomSlider) {
+      zoomSlider.value = clampedPercent;
+    }
+    if (zoomSliderValue) {
+      zoomSliderValue.textContent = `${clampedPercent}%`;
     }
   }
 

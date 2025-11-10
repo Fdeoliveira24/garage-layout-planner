@@ -176,8 +176,8 @@ class CanvasManager {
     let zoom = this.canvas.getZoom();
     zoom *= 0.999 ** delta;
     
-    // Limit zoom
-    if (zoom > 20) zoom = 20;
+    // Limit zoom to match slider range (10% - 200%)
+    if (zoom > 2) zoom = 2;
     if (zoom < 0.1) zoom = 0.1;
 
     this.canvas.zoomToPoint(
@@ -594,7 +594,7 @@ class CanvasManager {
   zoomIn() {
     const canvas = this.canvas;
     let zoom = canvas.getZoom();
-    zoom = Math.min(zoom * 1.1, 20);
+    zoom = Math.min(zoom * 1.1, 2); // Max 200%
     
     canvas.zoomToPoint(
       new fabric.Point(canvas.width / 2, canvas.height / 2),
@@ -610,7 +610,24 @@ class CanvasManager {
   zoomOut() {
     const canvas = this.canvas;
     let zoom = canvas.getZoom();
-    zoom = Math.max(zoom / 1.1, 0.1);
+    zoom = Math.max(zoom / 1.1, 0.1); // Min 10%
+    
+    canvas.zoomToPoint(
+      new fabric.Point(canvas.width / 2, canvas.height / 2),
+      zoom
+    );
+    
+    this.eventBus.emit('canvas:zoomed', zoom);
+  }
+
+  /**
+   * Set zoom to specific percentage (10-200%)
+   */
+  setZoomPercent(percent) {
+    const canvas = this.canvas;
+    // Clamp to slider range
+    const clampedPercent = Math.max(10, Math.min(200, percent));
+    const zoom = clampedPercent / 100;
     
     canvas.zoomToPoint(
       new fabric.Point(canvas.width / 2, canvas.height / 2),
