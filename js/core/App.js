@@ -239,37 +239,16 @@ class App {
       gridToggleText.textContent = showGrid ? 'Hide Grid' : 'Show Grid';
     }
 
-    // Update entry zone position buttons visibility
+    // Update entry zone position segmented control active state
     const entryZonePosition = this.state.get('settings.entryZonePosition') || 'bottom';
-    const entryZoneTopBtn = document.getElementById('btn-entry-zone-top');
-    const entryZoneBottomBtn = document.getElementById('btn-entry-zone-bottom');
-    const entryZoneLeftBtn = document.getElementById('btn-entry-zone-left');
-    const entryZoneRightBtn = document.getElementById('btn-entry-zone-right');
-    
-    // Hide all position buttons first
-    if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'none';
-    if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'none';
-    if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'none';
-    if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'none';
-    
-    // Show only the buttons for OTHER positions
-    if (entryZonePosition === 'top') {
-      if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'block';
-      if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'block';
-      if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'block';
-    } else if (entryZonePosition === 'bottom') {
-      if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'block';
-      if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'block';
-      if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'block';
-    } else if (entryZonePosition === 'left') {
-      if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'block';
-      if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'block';
-      if (entryZoneRightBtn) entryZoneRightBtn.style.display = 'block';
-    } else if (entryZonePosition === 'right') {
-      if (entryZoneTopBtn) entryZoneTopBtn.style.display = 'block';
-      if (entryZoneBottomBtn) entryZoneBottomBtn.style.display = 'block';
-      if (entryZoneLeftBtn) entryZoneLeftBtn.style.display = 'block';
-    }
+    const positionButtons = document.querySelectorAll('.segmented-button[data-position]');
+    positionButtons.forEach(btn => {
+      if (btn.dataset.position === entryZonePosition) {
+        btn.classList.add('is-active');
+      } else {
+        btn.classList.remove('is-active');
+      }
+    });
 
     // Update entry label toggle text
     const showEntryLabel = this.state.get('settings.showEntryZoneLabel') !== false;
