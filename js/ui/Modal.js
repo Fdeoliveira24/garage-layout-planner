@@ -27,8 +27,21 @@ class Modal {
       document.body.appendChild(overlay);
       
       const handleClose = (confirmed) => {
+        document.removeEventListener('keydown', keyHandler);
         overlay.remove();
         resolve(confirmed);
+      };
+      
+      const keyHandler = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(true);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(false);
+        }
       };
       
       modal.querySelector('[data-action="confirm"]').addEventListener('click', () => {
@@ -43,12 +56,7 @@ class Modal {
         if (e.target === overlay) handleClose(false);
       });
       
-      document.addEventListener('keydown', function escHandler(e) {
-        if (e.key === 'Escape') {
-          handleClose(false);
-          document.removeEventListener('keydown', escHandler);
-        }
-      });
+      document.addEventListener('keydown', keyHandler);
     });
   }
 
@@ -82,8 +90,21 @@ class Modal {
       input.select();
       
       const handleClose = (value) => {
+        document.removeEventListener('keydown', keyHandler);
         overlay.remove();
         resolve(value);
+      };
+      
+      const keyHandler = (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(input.value || null);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          e.stopPropagation();
+          handleClose(null);
+        }
       };
       
       modal.querySelector('[data-action="ok"]').addEventListener('click', () => {
@@ -98,10 +119,7 @@ class Modal {
         if (e.target === overlay) handleClose(null);
       });
       
-      input.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') handleClose(input.value || null);
-        if (e.key === 'Escape') handleClose(null);
-      });
+      document.addEventListener('keydown', keyHandler);
     });
   }
 
