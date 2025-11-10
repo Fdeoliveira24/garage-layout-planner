@@ -6,23 +6,24 @@ A professional, browser-based garage and storage layout planning tool built enti
 
 ## Recent Changes (Nov 10, 2025)
 
-**Professional View Dropdown Redesign (v2.7.0):**
-- **Segmented Control for Entry Position** - Converted entry zone position selector from rotating dropdown items to modern 2×2 segmented control grid
-  - All 4 positions (Top/Bottom/Left/Right) always visible with clear active state indication
-  - Active button highlighted with primary color background and white text
-  - Reduced cognitive load - no need to guess which positions are available
-- **Section Labels & Dividers** - Added visual hierarchy with uppercase section labels and subtle dividers
-  - "Canvas Guides" section for Grid toggle
-  - "Entry Zone Position" section for segmented control
-  - Entry Label and Border toggles grouped logically
-- **Consistent Material Design Icons** - Standardized all directional icons (upward/downward/left/right arrows)
-- **Fit to Screen Icon Update** - Simplified icon from complex corners to clean square with crosshair representing centering action
-- **CSS Architecture** - Added reusable classes for professional dropdown structure:
-  - `.dropdown-section` - section wrapper
-  - `.dropdown-section-label` - 11px uppercase labels with letter-spacing
-  - `.dropdown-divider` - 1px subtle separator
-  - `.segmented-control` - 2×2 grid layout
-  - `.segmented-button` - individual buttons with `.is-active` state
+**Zoom Slider Implementation (v2.8.0):**
+- **Slider-Based Zoom Control** - Replaced Zoom In/Out buttons with modern range slider
+  - Range: 10% minimum, 200% maximum, 5% steps, default 100%
+  - Live percentage display updates as slider moves
+  - Slider styled with branded primary color and smooth hover/active transitions
+- **Synchronized Zoom Limits** - All zoom pathways now respect 10-200% range:
+  - Mouse wheel zoom clamped to slider range (was 10-2000%)
+  - Zoom In/Out buttons limited to 10-200%
+  - Slider value stays synchronized across all zoom operations
+  - Fit to Screen respects same bounds
+- **UI Synchronization** - Zoom percentage display updates across all controls:
+  - Toolbar button shows current zoom percentage
+  - Slider thumb position matches zoom level
+  - Slider label displays current percentage in primary color
+- **Branded Styling** - Slider matches project design system:
+  - Primary color thumb with shadow and hover effects
+  - Secondary background track
+  - Smooth transitions and visual feedback
 
 **UX Improvements - Entry Zone & Zoom (v2.6.0):**
 - **Entry Zone Label Rotation** - "ENTRY ZONE" text now rotates 90° when positioned on left or right sides for better readability
