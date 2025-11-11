@@ -329,6 +329,9 @@ class ExportManager {
 
   /**
    * Calculate occupancy percentage
+   * @returns {number} Occupancy percentage
+   */
+  calculateOccupancy() {
     const floorPlan = this.state.get('floorPlan');
     if (!floorPlan) return 0;
 

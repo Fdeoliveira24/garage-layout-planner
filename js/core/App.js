@@ -987,11 +987,28 @@ class App {
           "This will clear the current layout. Make sure you've saved your work."
         );
         if (confirmed) {
-          this.itemManager.clearAll();
-          this.historyManager.clear();
-          this.state.set('projectName', 'Untitled Layout');
-          document.getElementById('project-name').textContent = 'Untitled Layout';
-          Modal.showSuccess('Started new layout');
+          console.log('[App] Starting new layout (mobile)');
+
+          // Clear everything (same as desktop version)
+          this.state.reset();
+          this.canvasManager.clear();
+
+          // CRITICAL: Clear autosave from localStorage immediately
+          Storage.remove(Config.STORAGE_KEYS.autosave);
+          console.log('[App] Cleared autosave from localStorage');
+
+          // Ensure viewport is reset (clear() already does this, but be explicit)
+          this.canvasManager.resetViewport();
+
+          // Show empty state
+          this.canvasManager.showEmptyState();
+
+          // Reset project name in DOM and document title
+          this.updateProjectName('Untitled Layout');
+
+          this.renderFloorPlanList();
+          this.updateInfoPanel();
+          Modal.showSuccess('New layout started');
         }
       });
     }
@@ -1651,6 +1668,12 @@ class App {
 
       // Load state
       this.state.loadState(layout.state);
+
+      // Update project name in UI and document title
+      this.updateProjectName(layout.state.metadata?.projectName);
+
+      // Sync view dropdown UI with loaded state
+      this.syncViewDropdownUI();
 
       // Reset viewport BEFORE refreshing canvas
       this.canvasManager.resetViewport();
