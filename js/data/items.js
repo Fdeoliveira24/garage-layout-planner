@@ -205,7 +205,7 @@ const Items = {
    * Get item by ID
    */
   getById(id) {
-    return this.getAll().find(item => item.id === id);
+    return this.getAll().find((item) => item.id === id);
   },
 
   /**
@@ -227,9 +227,9 @@ const Items = {
    */
   search(query) {
     const lowerQuery = query.toLowerCase();
-    return this.getAll().filter(item => 
-      item.label.toLowerCase().includes(lowerQuery) ||
-      item.id.toLowerCase().includes(lowerQuery)
+    return this.getAll().filter(
+      (item) =>
+        item.label.toLowerCase().includes(lowerQuery) || item.id.toLowerCase().includes(lowerQuery)
     );
   }
 };

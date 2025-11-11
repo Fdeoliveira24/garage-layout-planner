@@ -1,3 +1,5 @@
+/* global Helpers, Config */
+
 /**
  * Boundary Detection Utilities
  * Handle item constraints within floor plan
@@ -23,7 +25,7 @@ const Bounds = {
 
     // Check right boundary
     if (itemBounds.left + itemBounds.width > maxX) {
-      newLeft = item.left - ((itemBounds.left + itemBounds.width) - maxX);
+      newLeft = item.left - (itemBounds.left + itemBounds.width - maxX);
     }
 
     // Check top boundary
@@ -33,7 +35,7 @@ const Bounds = {
 
     // Check bottom boundary
     if (itemBounds.top + itemBounds.height > maxY) {
-      newTop = item.top - ((itemBounds.top + itemBounds.height) - maxY);
+      newTop = item.top - (itemBounds.top + itemBounds.height - maxY);
     }
 
     item.set({ left: newLeft, top: newTop });
@@ -50,24 +52,42 @@ const Bounds = {
     const maxX = Helpers.feetToPx(floorPlan.widthFt);
     const maxY = Helpers.feetToPx(floorPlan.heightFt);
 
-    return itemBounds.left >= 0 &&
-           itemBounds.top >= 0 &&
-           itemBounds.left + itemBounds.width <= maxX &&
-           itemBounds.top + itemBounds.height <= maxY;
+    return (
+      itemBounds.left >= 0 &&
+      itemBounds.top >= 0 &&
+      itemBounds.left + itemBounds.width <= maxX &&
+      itemBounds.top + itemBounds.height <= maxY
+    );
   },
 
   /**
-   * Check if item is in entry zone (bottom 20%)
+   * Check if item is in entry zone
+   * Supports all 4 entry zone positions (top, bottom, left, right)
    */
-  isInEntryZone(item, floorPlan) {
+  isInEntryZone(item, floorPlan, entryZonePosition) {
     if (!floorPlan) return false;
 
     const itemBounds = item.getBoundingRect();
+    const floorPlanWidth = Helpers.feetToPx(floorPlan.widthFt);
     const floorPlanHeight = Helpers.feetToPx(floorPlan.heightFt);
-    const entryZoneStart = floorPlanHeight * (1 - Config.ENTRY_ZONE_PERCENTAGE);
+    const position = entryZonePosition || 'bottom';
 
-    // Check if any part of item is in entry zone
-    return itemBounds.top + itemBounds.height > entryZoneStart;
+    // Calculate entry zone bounds based on position
+    if (position === 'bottom') {
+      const entryZoneStart = floorPlanHeight * (1 - Config.ENTRY_ZONE_PERCENTAGE);
+      return itemBounds.top + itemBounds.height > entryZoneStart;
+    } else if (position === 'top') {
+      const entryZoneEnd = floorPlanHeight * Config.ENTRY_ZONE_PERCENTAGE;
+      return itemBounds.top < entryZoneEnd;
+    } else if (position === 'left') {
+      const entryZoneEnd = floorPlanWidth * Config.ENTRY_ZONE_PERCENTAGE;
+      return itemBounds.left < entryZoneEnd;
+    } else if (position === 'right') {
+      const entryZoneStart = floorPlanWidth * (1 - Config.ENTRY_ZONE_PERCENTAGE);
+      return itemBounds.left + itemBounds.width > entryZoneStart;
+    }
+
+    return false;
   },
 
   /**
@@ -109,7 +129,7 @@ const Bounds = {
   itemsOverlap(item1, item2) {
     const b1 = this.getItemBounds(item1);
     const b2 = this.getItemBounds(item2);
-    
+
     return Helpers.rectanglesOverlap(b1, b2);
   },
 
@@ -120,9 +140,9 @@ const Bounds = {
     const nearby = [];
     const targetBounds = this.getItemBounds(targetItem);
 
-    allItems.forEach(item => {
+    allItems.forEach((item) => {
       if (item === targetItem) return;
-      
+
       const itemBounds = this.getItemBounds(item);
 
       // Check if edges are close
@@ -131,11 +151,21 @@ const Bounds = {
         { type: 'right', dist: Math.abs(targetBounds.right - itemBounds.right) },
         { type: 'top', dist: Math.abs(targetBounds.top - itemBounds.top) },
         { type: 'bottom', dist: Math.abs(targetBounds.bottom - itemBounds.bottom) },
-        { type: 'centerX', dist: Math.abs((targetBounds.left + targetBounds.right) / 2 - (itemBounds.left + itemBounds.right) / 2) },
-        { type: 'centerY', dist: Math.abs((targetBounds.top + targetBounds.bottom) / 2 - (itemBounds.top + itemBounds.bottom) / 2) }
+        {
+          type: 'centerX',
+          dist: Math.abs(
+            (targetBounds.left + targetBounds.right) / 2 - (itemBounds.left + itemBounds.right) / 2
+          )
+        },
+        {
+          type: 'centerY',
+          dist: Math.abs(
+            (targetBounds.top + targetBounds.bottom) / 2 - (itemBounds.top + itemBounds.bottom) / 2
+          )
+        }
       ];
 
-      edges.forEach(edge => {
+      edges.forEach((edge) => {
         if (edge.dist < threshold) {
           nearby.push({
             item,

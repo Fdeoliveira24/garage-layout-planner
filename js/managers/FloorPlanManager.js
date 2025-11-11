@@ -1,3 +1,5 @@
+/* global FloorPlans, Validation */
+
 /**
  * Floor Plan Manager
  * Handles floor plan CRUD operations and validation
@@ -14,7 +16,7 @@ class FloorPlanManager {
    */
   setFloorPlan(floorPlanId) {
     const floorPlan = FloorPlans.getById(floorPlanId);
-    
+
     if (!floorPlan) {
       console.error('Floor plan not found:', floorPlanId);
       return false;
@@ -27,8 +29,13 @@ class FloorPlanManager {
       return false;
     }
 
+    // [FloorPlanManager] Setting floor plan: id
+
     // Update state
     this.state.setState({ floorPlan });
+
+    // Reset viewport before drawing new floor plan
+    this.canvasManager.resetViewport();
 
     // Draw on canvas
     this.canvasManager.drawFloorPlan(floorPlan);
@@ -68,7 +75,7 @@ class FloorPlanManager {
   getOccupiedArea() {
     const items = this.state.get('items') || [];
     return items.reduce((total, item) => {
-      return total + (item.lengthFt * item.widthFt);
+      return total + item.lengthFt * item.widthFt;
     }, 0);
   }
 

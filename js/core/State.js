@@ -35,7 +35,7 @@ class State {
         version: '1.0.0'
       }
     };
-    
+
     this.observers = [];
   }
 
@@ -53,10 +53,10 @@ class State {
   setState(updates) {
     // Deep merge updates into state
     this._deepMerge(this.state, updates);
-    
+
     // Update modified timestamp
     this.state.metadata.modified = new Date().toISOString();
-    
+
     // Notify observers
     this._notifyObservers();
   }
@@ -67,10 +67,10 @@ class State {
    */
   subscribe(callback) {
     this.observers.push(callback);
-    
+
     // Return unsubscribe function
     return () => {
-      this.observers = this.observers.filter(obs => obs !== callback);
+      this.observers = this.observers.filter((obs) => obs !== callback);
     };
   }
 
@@ -92,7 +92,7 @@ class State {
     const lastKey = keys.pop();
     const target = keys.reduce((obj, key) => obj[key], this.state);
     target[lastKey] = value;
-    
+
     this.state.metadata.modified = new Date().toISOString();
     this._notifyObservers();
   }
@@ -102,7 +102,7 @@ class State {
    */
   reset() {
     const settings = { ...this.state.settings };
-    
+
     this.state = {
       floorPlan: null,
       items: [],
@@ -124,7 +124,7 @@ class State {
         version: '1.0.0'
       }
     };
-    
+
     this._notifyObservers();
   }
 
@@ -132,15 +132,41 @@ class State {
    * Load state from object
    * @param {object} savedState - Previously saved state
    */
+  /**
+   * Load saved state
+   * Validates and merges saved state into current state
+   * @param {object} savedState - Previously saved state object
+   */
   loadState(savedState) {
+    if (!savedState) {
+      console.warn('[State] Attempted to load null/undefined state');
+      return;
+    }
+
+    // Validate state structure
+    if (typeof savedState !== 'object') {
+      console.error('[State] Invalid state type:', typeof savedState);
+      return;
+    }
+
+    // [State] Loading state
+
+    // Merge saved state, preserving structure
     this.state = {
       ...this.state,
-      ...savedState,
+      floorPlan: savedState.floorPlan || null,
+      items: Array.isArray(savedState.items) ? savedState.items : [],
+      settings: {
+        ...this.state.settings,
+        ...(savedState.settings || {})
+      },
       metadata: {
-        ...savedState.metadata,
+        ...this.state.metadata,
+        ...(savedState.metadata || {}),
         modified: new Date().toISOString()
       }
     };
+
     this._notifyObservers();
   }
 
@@ -157,7 +183,7 @@ class State {
    */
   _notifyObservers() {
     const state = this.getState();
-    this.observers.forEach(callback => {
+    this.observers.forEach((callback) => {
       try {
         callback(state);
       } catch (error) {

@@ -6,7 +6,7 @@ const FloorPlans = {
   templates: [
     {
       id: 'fp-20x25',
-      name: '20\' × 25\'',
+      name: "20' × 25'",
       widthFt: 20,
       heightFt: 25,
       type: 'rectangular',
@@ -15,7 +15,7 @@ const FloorPlans = {
     },
     {
       id: 'fp-20x30',
-      name: '20\' × 30\'',
+      name: "20' × 30'",
       widthFt: 20,
       heightFt: 30,
       type: 'rectangular',
@@ -24,7 +24,7 @@ const FloorPlans = {
     },
     {
       id: 'fp-20x40',
-      name: '20\' × 40\'',
+      name: "20' × 40'",
       widthFt: 20,
       heightFt: 40,
       type: 'rectangular',
@@ -33,7 +33,7 @@ const FloorPlans = {
     },
     {
       id: 'fp-24x30',
-      name: '24\' × 30\'',
+      name: "24' × 30'",
       widthFt: 24,
       heightFt: 30,
       type: 'rectangular',
@@ -42,7 +42,7 @@ const FloorPlans = {
     },
     {
       id: 'fp-24x40',
-      name: '24\' × 40\'',
+      name: "24' × 40'",
       widthFt: 24,
       heightFt: 40,
       type: 'rectangular',
@@ -51,7 +51,7 @@ const FloorPlans = {
     },
     {
       id: 'fp-24x48',
-      name: '24\' × 48\'',
+      name: "24' × 48'",
       widthFt: 24,
       heightFt: 48,
       type: 'rectangular',
@@ -60,7 +60,7 @@ const FloorPlans = {
     },
     {
       id: 'fp-24x50',
-      name: '24\' × 50\'',
+      name: "24' × 50'",
       widthFt: 24,
       heightFt: 50,
       type: 'rectangular',
@@ -73,7 +73,7 @@ const FloorPlans = {
    * Get floor plan by ID
    */
   getById(id) {
-    return this.templates.find(fp => fp.id === id);
+    return this.templates.find((fp) => fp.id === id);
   },
 
   /**
@@ -87,7 +87,7 @@ const FloorPlans = {
    * Get floor plans by type
    */
   getByType(type) {
-    return this.templates.filter(fp => fp.type === type);
+    return this.templates.filter((fp) => fp.type === type);
   }
 };
 
