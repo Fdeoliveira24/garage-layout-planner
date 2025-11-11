@@ -148,6 +148,20 @@ class App {
       this.checkEntryZoneViolations();
     });
 
+    // Floor plan loaded (for import)
+    this.eventBus.on('floorplan:loaded', (floorPlan) => {
+      this.canvasManager.drawFloorPlan(floorPlan);
+      this.canvasManager.redrawFloorPlan();
+      this.updateInfoPanel();
+    });
+
+    // Import completed - save to history after all items loaded
+    this.eventBus.on('import:json:complete', () => {
+      this.historyManager.save();
+      this.updateInfoPanel();
+      this.checkEntryZoneViolations();
+    });
+
     // Floor plan events
     this.eventBus.on('floorplan:changed', () => {
       this.historyManager.save();
@@ -1138,6 +1152,20 @@ class App {
     const container = document.createElement('div');
     container.style.cssText = 'display: flex; flex-direction: column; gap: 16px;';
 
+    // IMPORT section
+    const importSection = document.createElement('div');
+    importSection.innerHTML = `
+      <div style="margin-bottom: 8px; color: #71717A; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+        IMPORT
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <button class="dropdown-item" data-action="import-json">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,11L16,15H13.5V18H10.5V15H8L12,11Z"/></svg>
+          Import JSON
+        </button>
+      </div>
+    `;
+
     // EXPORT section
     const exportSection = document.createElement('div');
     exportSection.innerHTML = `
@@ -1204,10 +1232,21 @@ class App {
       </div>
     `;
 
+    container.appendChild(importSection);
     container.appendChild(exportSection);
     container.appendChild(viewSection);
 
     // Event handlers
+    // Import handler
+    container.querySelector('[data-action="import-json"]').onclick = () => {
+      const jsonFileInput = document.getElementById('json-file-input');
+      if (jsonFileInput) {
+        jsonFileInput.click();
+        Modal.close();
+      }
+    };
+
+    // Export handlers
     container.querySelector('[data-action="export-json"]').onclick = () => {
       this.exportManager.exportJSON();
       Modal.close();
