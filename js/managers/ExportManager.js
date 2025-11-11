@@ -1,8 +1,8 @@
-/* global Helpers, Modal */
+/* global Helpers, Modal, FileReader */
 
 /**
  * Export Manager
- * Handles JSON, PNG, and PDF exports
+ * Handles JSON, PNG, and PDF exports and imports
  */
 class ExportManager {
   constructor(state, eventBus, canvasManager) {
@@ -247,7 +247,88 @@ class ExportManager {
   /**
    * Calculate occupancy percentage
    */
-  calculateOccupancy() {
+  /**
+   * Import from JSON
+   * Loads a previously exported layout from JSON file
+   */
+  async importJSON(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        reject(new Error('No file provided'));
+        return;
+      }
+
+      if (!file.name.endsWith('.json')) {
+        Modal.showError('Please select a valid JSON file');
+        reject(new Error('Invalid file type'));
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        try {
+          const importData = JSON.parse(e.target.result);
+
+          // Validate the imported data structure
+          if (!importData.version || !importData.floorPlan || !importData.items) {
+            Modal.showError('Invalid layout file format');
+            reject(new Error('Invalid JSON structure'));
+            return;
+          }
+
+          // Load the floor plan first
+          if (importData.floorPlan) {
+            this.state.set('floorPlan', importData.floorPlan);
+            this.eventBus.emit('floorplan:loaded', importData.floorPlan);
+          }
+
+          // Load settings if available
+          if (importData.settings) {
+            Object.keys(importData.settings).forEach((key) => {
+              this.state.set(`settings.${key}`, importData.settings[key]);
+            });
+          }
+
+          // Load metadata if available
+          if (importData.metadata) {
+            Object.keys(importData.metadata).forEach((key) => {
+              this.state.set(`metadata.${key}`, importData.metadata[key]);
+            });
+          }
+
+          // Clear existing items and load new ones
+          this.state.set('items', []);
+          this.eventBus.emit('items:cleared');
+
+          // Add imported items
+          if (importData.items && importData.items.length > 0) {
+            importData.items.forEach((itemData) => {
+              this.eventBus.emit('item:add:imported', itemData);
+            });
+          }
+
+          Modal.showSuccess(`Layout "${importData.metadata?.projectName || 'Untitled'}" imported successfully!`);
+          this.eventBus.emit('import:json:complete', importData);
+          resolve(importData);
+        } catch (error) {
+          console.error('Error parsing JSON:', error);
+          Modal.showError('Failed to parse JSON file');
+          reject(error);
+        }
+      };
+
+      reader.onerror = () => {
+        Modal.showError('Failed to read file');
+        reject(new Error('File read error'));
+      };
+
+      reader.readAsText(file);
+    });
+  }
+
+  /**
+   * Calculate occupancy percentage
     const floorPlan = this.state.get('floorPlan');
     if (!floorPlan) return 0;
 

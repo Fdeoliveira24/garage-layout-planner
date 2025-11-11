@@ -129,6 +129,25 @@ class App {
       this.checkEntryZoneViolations();
     });
 
+    // Import item from JSON
+    this.eventBus.on('item:add:imported', (itemData) => {
+      const newItem = this.itemManager.addItem(itemData.itemId, itemData.x, itemData.y);
+      if (newItem && newItem.canvasObject) {
+        newItem.canvasObject.rotate(itemData.angle || 0);
+        if (itemData.locked) {
+          newItem.canvasObject.set({ lockMovementX: true, lockMovementY: true });
+        }
+        this.canvasManager.getCanvas().renderAll();
+      }
+    });
+
+    // Items cleared (for import)
+    this.eventBus.on('items:cleared', () => {
+      this.canvasManager.clearItems();
+      this.updateInfoPanel();
+      this.checkEntryZoneViolations();
+    });
+
     // Floor plan events
     this.eventBus.on('floorplan:changed', () => {
       this.historyManager.save();
@@ -542,6 +561,28 @@ class App {
     const exportPdfBtn = document.getElementById('btn-export-pdf');
     if (exportPdfBtn) {
       exportPdfBtn.addEventListener('click', () => this.exportManager.exportPDF());
+    }
+
+    // Import JSON
+    const importJsonBtn = document.getElementById('btn-import-json');
+    const jsonFileInput = document.getElementById('json-file-input');
+    if (importJsonBtn && jsonFileInput) {
+      importJsonBtn.addEventListener('click', () => {
+        jsonFileInput.click();
+      });
+
+      jsonFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          try {
+            await this.exportManager.importJSON(file);
+            // Clear the input so the same file can be imported again
+            jsonFileInput.value = '';
+          } catch (error) {
+            console.error('Import failed:', error);
+          }
+        }
+      });
     }
 
     // Save
