@@ -47,3 +47,18 @@
   background-color: white;
   box-shadow: var(--shadow-md);
 }
+
+/* ================================
+   FABRIC.JS CONTROL CUSTOMIZATION
+   Professional Selection Handles
+   ================================ */
+
+/* Selection border styling */
+.canvas-container .upper-canvas {
+  outline: none;
+}
+
+/* Override Fabric.js default control styles with modern, professional look */
+.canvas-container canvas[class*='canvas'] {
+  outline: none;
+}

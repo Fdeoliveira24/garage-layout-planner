@@ -34,7 +34,37 @@ class CanvasManager {
     this.canvas = new fabric.Canvas(this.canvasId, {
       backgroundColor: '#ffffff',
       selection: true,
-      preserveObjectStacking: true
+      preserveObjectStacking: true,
+      // Professional control styling
+      selectionColor: 'rgba(99, 102, 241, 0.1)',
+      selectionBorderColor: '#6366F1',
+      selectionLineWidth: 2,
+      // Corner/control styling for better visibility
+      borderColor: '#6366F1',
+      cornerColor: '#6366F1',
+      cornerStrokeColor: '#ffffff',
+      cornerStyle: 'circle',
+      cornerSize: 14,
+      transparentCorners: false,
+      borderDashArray: [5, 5],
+      borderScaleFactor: 2,
+      // Rotation control styling
+      rotatingPointOffset: 40,
+      // Padding for better hit area
+      padding: 0
+    });
+
+    // Customize multi-selection (ActiveSelection) appearance
+    fabric.ActiveSelection.prototype.set({
+      borderColor: '#6366F1',
+      cornerColor: '#6366F1',
+      cornerStrokeColor: '#ffffff',
+      cornerStyle: 'circle',
+      cornerSize: 14,
+      transparentCorners: false,
+      borderDashArray: [5, 5],
+      borderScaleFactor: 2,
+      padding: 0
     });
 
     // Setup event listeners
@@ -552,15 +582,21 @@ class CanvasManager {
       evented: true,
       hasControls: true,
       hasBorders: true,
-      lockScalingX: true,
-      lockScalingY: true,
+      lockScalingX: false,
+      lockScalingY: false,
       lockSkewingX: true,
       lockSkewingY: true,
+      // Professional control styling (matches canvas defaults)
       borderColor: '#6366F1',
       borderScaleFactor: 2,
+      borderDashArray: [5, 5],
       cornerColor: '#6366F1',
-      cornerSize: 12,
+      cornerStrokeColor: '#ffffff',
+      cornerStyle: 'circle',
+      cornerSize: 14,
       transparentCorners: false,
+      rotatingPointOffset: 40,
+      padding: 0,
       shadow: new fabric.Shadow({
         color: 'rgba(0,0,0,0.3)',
         blur: 10,
@@ -569,16 +605,17 @@ class CanvasManager {
       })
     });
 
-    // Hide all control handles EXCEPT rotation (mtr)
+    // Show corner handles for scaling and rotation handle
+    // Hide middle edge handles to prevent non-uniform scaling
     group.setControlsVisibility({
       mt: false, // middle top
       mb: false, // middle bottom
       ml: false, // middle left
       mr: false, // middle right
-      bl: false, // bottom left
-      br: false, // bottom right
-      tl: false, // top left
-      tr: false, // top right
+      bl: true, // bottom left - SHOW for scaling
+      br: true, // bottom right - SHOW for scaling
+      tl: true, // top left - SHOW for scaling
+      tr: true, // top right - SHOW for scaling
       mtr: true // rotation handle - KEEP VISIBLE
     });
 
