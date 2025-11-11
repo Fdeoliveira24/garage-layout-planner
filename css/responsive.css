@@ -244,6 +244,13 @@
   }
 }
 
+/* Tablet: Canvas padding for fixed info bar */
+@media (max-width: 767px) and (min-width: 481px) {
+  .canvas-container {
+    padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 /* ================================
    MOBILE (< 480px)
    ================================ */
@@ -278,6 +285,7 @@
     box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
     padding: 6px 12px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
     gap: 8px;
     align-items: center;
     justify-content: space-around;
@@ -305,7 +313,7 @@
 
   /* Canvas adjusted for bottom toolbar */
   .canvas-container {
-    padding-bottom: 56px;
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0px));
   }
 
   /* Sidebar full width on mobile */
@@ -436,4 +444,12 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* ================================
+   MOBILE DRAWER SCROLL LOCK
+   ================================ */
+/* Prevent body scroll when mobile sidebar is open */
+body.drawer-open {
+  overflow: hidden;
 }

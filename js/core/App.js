@@ -872,7 +872,7 @@ class App {
         sidebarBackdrop.classList.toggle('active', isActive);
 
         // Prevent body scroll when sidebar is open
-        document.body.style.overflow = isActive ? 'hidden' : '';
+        document.body.classList.toggle('drawer-open', isActive);
       }
     };
 
@@ -881,7 +881,7 @@ class App {
       if (sidebar && sidebarBackdrop) {
         sidebar.classList.remove('active');
         sidebarBackdrop.classList.remove('active');
-        document.body.style.overflow = '';
+        document.body.classList.remove('drawer-open');
       }
     };
 
