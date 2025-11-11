@@ -1351,14 +1351,12 @@ class App {
   refreshCanvas() {
     // [App] Refreshing canvas from state
 
+    // ALWAYS clear canvas first (critical for undo/redo)
+    // This also resets viewport automatically
+    this.canvasManager.clear();
+
     const floorPlan = this.state.get('floorPlan');
     if (floorPlan) {
-      // Clear canvas (this resets viewport)
-      this.canvasManager.clear();
-
-      // Ensure viewport is at default state
-      this.canvasManager.resetViewport();
-
       // Draw floor plan
       this.canvasManager.drawFloorPlan(floorPlan);
 
@@ -1380,6 +1378,9 @@ class App {
 
       // Final render
       this.canvasManager.getCanvas().renderAll();
+    } else {
+      // No floor plan - show empty state
+      this.canvasManager.showEmptyState();
     }
 
     this.updateInfoPanel();
