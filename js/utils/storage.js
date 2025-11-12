@@ -1,102 +1,163 @@
 /**
- * LocalStorage Wrapper
- * Safe localStorage operations with error handling and in-memory fallback
+ * Local/session storage wrapper with graceful fallbacks.
+ * Falls back to sessionStorage (per-tab) and then in-memory storage when needed.
  */
 const Storage = (() => {
-  // In-memory fallback storage
+  const STORAGE_TYPES = {
+    LOCAL: 'local',
+    SESSION: 'session',
+    MEMORY: 'memory'
+  };
+
   const memoryStorage = new Map();
-  let useMemoryFallback = false;
+  let activeStorageType = STORAGE_TYPES.LOCAL;
   let isStorageAvailable = false;
 
   /**
-   * Detect if localStorage is available and writable
+   * Try accessing the requested storage bucket with a read/write test.
    */
-  function detectStorage() {
-    try {
-      if (typeof window === 'undefined' || !window.localStorage) {
-        console.warn('[Storage] localStorage not available - using in-memory fallback');
-        useMemoryFallback = true;
-        isStorageAvailable = false;
-        return false;
-      }
+  function canUseStorage(type) {
+    if (typeof window === 'undefined') return false;
+    const storage = type === STORAGE_TYPES.LOCAL ? window.localStorage : window.sessionStorage;
+    if (!storage) return false;
 
-      // Test if we can write to localStorage
+    try {
       const testKey = '__storage_test__';
-      window.localStorage.setItem(testKey, 'test');
-      window.localStorage.removeItem(testKey);
-      
-      isStorageAvailable = true;
-      useMemoryFallback = false;
-      console.log('[Storage] localStorage available and writable');
+      storage.setItem(testKey, 'test');
+      storage.removeItem(testKey);
       return true;
     } catch (error) {
-      console.warn('[Storage] localStorage detected but not writable - using in-memory fallback', error);
-      useMemoryFallback = true;
-      isStorageAvailable = false;
       return false;
     }
   }
 
-  // Run detection at startup
+  /**
+   * Switch to the provided storage type.
+   */
+  function setActiveStorage(type) {
+    activeStorageType = type;
+    isStorageAvailable = type !== STORAGE_TYPES.MEMORY;
+
+    if (type === STORAGE_TYPES.LOCAL) {
+      console.log('[Storage] Using localStorage');
+    } else if (type === STORAGE_TYPES.SESSION) {
+      console.warn('[Storage] Falling back to sessionStorage (cleared when tab closes)');
+    } else {
+      console.warn('[Storage] Using volatile in-memory storage (cleared on reload)');
+    }
+  }
+
+  /**
+   * Run detection in priority order: localStorage -> sessionStorage -> memory.
+   */
+  function detectStorage() {
+    if (canUseStorage(STORAGE_TYPES.LOCAL)) {
+      setActiveStorage(STORAGE_TYPES.LOCAL);
+      return true;
+    }
+
+    if (canUseStorage(STORAGE_TYPES.SESSION)) {
+      setActiveStorage(STORAGE_TYPES.SESSION);
+      return true;
+    }
+
+    setActiveStorage(STORAGE_TYPES.MEMORY);
+    return false;
+  }
+
+  /**
+   * Attempt to fallback to the next available storage tier.
+   */
+  function fallbackToNextTier() {
+    if (activeStorageType === STORAGE_TYPES.LOCAL && canUseStorage(STORAGE_TYPES.SESSION)) {
+      setActiveStorage(STORAGE_TYPES.SESSION);
+      return true;
+    }
+
+    setActiveStorage(STORAGE_TYPES.MEMORY);
+    return false;
+  }
+
+  function getActiveBrowserStorage() {
+    if (typeof window === 'undefined') return null;
+    if (activeStorageType === STORAGE_TYPES.LOCAL) {
+      return window.localStorage;
+    }
+    if (activeStorageType === STORAGE_TYPES.SESSION) {
+      return window.sessionStorage;
+    }
+    return null;
+  }
+
+  // Initial detection
   detectStorage();
 
   return {
     /**
-     * Flag indicating if persistent storage is available
+     * Flag indicating if we have persistent (local or session) storage.
      */
     get isAvailable() {
       return isStorageAvailable;
     },
 
     /**
-     * Save data to storage
+     * Whether data survives a full browser restart (only true for localStorage).
      */
-    save(key, data) {
-      try {
-        const serialized = JSON.stringify(data);
-        
-        if (useMemoryFallback) {
-          memoryStorage.set(key, serialized);
-          return true;
-        }
+    get isPersistent() {
+      return activeStorageType === STORAGE_TYPES.LOCAL;
+    },
 
-        localStorage.setItem(key, serialized);
+    /**
+     * Expose current mode for debugging (local, session, memory)
+     */
+    get mode() {
+      return activeStorageType;
+    },
+
+    save(key, data) {
+      const serialized = JSON.stringify(data);
+
+      if (activeStorageType === STORAGE_TYPES.MEMORY) {
+        memoryStorage.set(key, serialized);
+        return true;
+      }
+
+      try {
+        const storage = getActiveBrowserStorage();
+        if (!storage) {
+          throw new Error('Active storage missing');
+        }
+        storage.setItem(key, serialized);
         return true;
       } catch (error) {
         console.error('[Storage] Error saving data:', error);
         if (error.name === 'QuotaExceededError') {
-          console.warn('[Storage] Quota exceeded - consider clearing old data');
+          console.warn('[Storage] Quota exceeded - attempting fallback');
         }
-        
-        // Fallback to memory if localStorage fails
-        if (!useMemoryFallback) {
-          console.warn('[Storage] Falling back to in-memory storage');
-          useMemoryFallback = true;
-          isStorageAvailable = false;
-          try {
-            memoryStorage.set(key, JSON.stringify(data));
-            return true;
-          } catch (memError) {
-            console.error('[Storage] Memory fallback also failed:', memError);
-          }
+
+        if (fallbackToNextTier()) {
+          return this.save(key, data);
         }
-        return false;
+
+        try {
+          memoryStorage.set(key, serialized);
+          return true;
+        } catch (memError) {
+          console.error('[Storage] Memory fallback also failed:', memError);
+          return false;
+        }
       }
     },
 
-    /**
-     * Load data from storage
-     */
     load(key) {
       try {
-        let data;
-        
-        if (useMemoryFallback) {
-          data = memoryStorage.get(key);
-        } else {
-          data = localStorage.getItem(key);
+        if (activeStorageType === STORAGE_TYPES.MEMORY) {
+          const data = memoryStorage.get(key);
+          return data ? JSON.parse(data) : null;
         }
 
+        const storage = getActiveBrowserStorage();
+        const data = storage ? storage.getItem(key) : null;
         return data ? JSON.parse(data) : null;
       } catch (error) {
         console.error('[Storage] Error loading data:', error);
@@ -104,91 +165,91 @@ const Storage = (() => {
       }
     },
 
-    /**
-     * Remove data from storage
-     */
     remove(key) {
       try {
-        if (useMemoryFallback) {
+        if (activeStorageType === STORAGE_TYPES.MEMORY) {
           memoryStorage.delete(key);
           return true;
         }
 
-        localStorage.removeItem(key);
-        return true;
+        const storage = getActiveBrowserStorage();
+        if (storage) {
+          storage.removeItem(key);
+          return true;
+        }
+
+        return false;
       } catch (error) {
         console.error('[Storage] Error removing data:', error);
         return false;
       }
     },
 
-    /**
-     * Check if key exists
-     */
     has(key) {
       try {
-        if (useMemoryFallback) {
+        if (activeStorageType === STORAGE_TYPES.MEMORY) {
           return memoryStorage.has(key);
         }
 
-        return localStorage.getItem(key) !== null;
+        const storage = getActiveBrowserStorage();
+        return storage ? storage.getItem(key) !== null : false;
       } catch (error) {
         console.error('[Storage] Error checking key:', error);
         return false;
       }
     },
 
-    /**
-     * Clear all storage
-     */
     clear() {
       try {
-        if (useMemoryFallback) {
+        if (activeStorageType === STORAGE_TYPES.MEMORY) {
           memoryStorage.clear();
           return true;
         }
 
-        localStorage.clear();
-        return true;
+        const storage = getActiveBrowserStorage();
+        if (storage) {
+          storage.clear();
+          return true;
+        }
+
+        return false;
       } catch (error) {
         console.error('[Storage] Error clearing storage:', error);
         return false;
       }
     },
 
-    /**
-     * Get all keys
-     */
     keys() {
       try {
-        if (useMemoryFallback) {
+        if (activeStorageType === STORAGE_TYPES.MEMORY) {
           return Array.from(memoryStorage.keys());
         }
 
-        return Object.keys(localStorage);
+        const storage = getActiveBrowserStorage();
+        return storage ? Object.keys(storage) : [];
       } catch (error) {
         console.error('[Storage] Error getting keys:', error);
         return [];
       }
     },
 
-    /**
-     * Get storage size (approximate bytes)
-     */
     getSize() {
       try {
         let size = 0;
-        
-        if (useMemoryFallback) {
+
+        if (activeStorageType === STORAGE_TYPES.MEMORY) {
           for (const [key, value] of memoryStorage) {
             size += key.length + value.length;
           }
           return size;
         }
 
-        for (const key in localStorage) {
-          if (localStorage.hasOwnProperty(key)) {
-            size += localStorage[key].length + key.length;
+        const storage = getActiveBrowserStorage();
+        if (!storage) return 0;
+
+        for (const key in storage) {
+          if (Object.prototype.hasOwnProperty.call(storage, key)) {
+            size += storage[key].length + key.length;
           }
         }
         return size;
@@ -198,9 +259,6 @@ const Storage = (() => {
       }
     },
 
-    /**
-     * Re-run storage detection (useful for testing or recovery)
-     */
     redetect() {
       return detectStorage();
     }

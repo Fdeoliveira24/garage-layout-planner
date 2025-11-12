@@ -48,6 +48,9 @@ const Config = {
   NUDGE_DISTANCE: 2, // pixels
   NUDGE_DISTANCE_LARGE: 10, // pixels with Shift
 
+  // Images
+  USE_IMAGES: true, // Enable image-based rendering for supported items
+
   // Colors
   COLORS: {
     floorPlan: '#ffffff',

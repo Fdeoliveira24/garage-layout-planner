@@ -455,16 +455,13 @@ class CanvasManager {
     // Draw grid if enabled
     if (this.state.get('settings.showGrid')) {
       this.drawGrid(width, height);
+    } else {
+      this.gridLines.forEach((line) => this.canvas.remove(line));
+      this.gridLines = [];
     }
 
-    // Set z-order: floor plan at back, then grid, then entry zone/label
-    // First send all grid lines to back
-    this.gridLines.forEach((line) => line.sendToBack());
-    // Then send floor plan to back (this puts it below the grid)
-    this.floorPlanRect.sendToBack();
-    // Bring entry zone elements to front (but still behind items)
-    this.entryZoneRect.bringForward();
-    this.entryZoneLabel.bringForward();
+    // Ensure core layers remain in the correct order
+    this.setLayerOrder();
 
     // Center and fit
     this.centerAndFit(width, height);
@@ -482,11 +479,15 @@ class CanvasManager {
 
     const gridSize = Config.GRID_SIZE;
 
+    const majorLineEvery = gridSize * 5; // Highlight every 5 feet
+
     // Vertical lines
     for (let i = 0; i <= width; i += gridSize) {
+      const isMajor = i % majorLineEvery === 0;
       const line = new fabric.Line([i, 0, i, height], {
         stroke: Config.COLORS.grid,
-        strokeWidth: i % 50 === 0 ? 1.5 : 0.5,
+        strokeWidth: isMajor ? 1.25 : 0.5,
+        opacity: isMajor ? 0.35 : 0.18,
         selectable: false,
         evented: false
       });
@@ -496,9 +497,11 @@ class CanvasManager {
 
     // Horizontal lines
     for (let i = 0; i <= height; i += gridSize) {
+      const isMajor = i % majorLineEvery === 0;
       const line = new fabric.Line([0, i, width, i], {
         stroke: Config.COLORS.grid,
-        strokeWidth: i % 50 === 0 ? 1.5 : 0.5,
+        strokeWidth: isMajor ? 1.25 : 0.5,
+        opacity: isMajor ? 0.35 : 0.18,
         selectable: false,
         evented: false
       });
@@ -542,6 +545,138 @@ class CanvasManager {
   addItem(itemData, x, y) {
     const width = Helpers.feetToPx(itemData.widthFt);
     const height = Helpers.feetToPx(itemData.lengthFt); // Vertical by default
+
+    // Check if we should use image rendering for this item
+    const useImage = Config.USE_IMAGES && itemData.canvasImage && itemData.id === 'rv-26';
+
+    if (useImage) {
+      // Load image and create image-based group
+      this._addItemWithImage(itemData, x, y, width, height);
+      return; // Image loading is async, return early
+    }
+
+    // Create rectangle-based item (existing behavior)
+    this._addItemWithRectangle(itemData, x, y, width, height);
+  }
+
+  /**
+   * Add item with image rendering
+   * @private
+   */
+  _addItemWithImage(itemData, x, y, width, height) {
+    fabric.Image.fromURL(
+      itemData.canvasImage,
+      (img) => {
+        if (!img || !img.width || !img.height) {
+          console.warn(`[CanvasManager] Failed to load image for ${itemData.id}, falling back to rectangle`);
+          this._addItemWithRectangle(itemData, x, y, width, height);
+          return;
+        }
+
+        // Scale image to match item dimensions
+        const scaleX = width / img.width;
+        const scaleY = height / img.height;
+
+        // Position image centered at origin
+        img.set({
+          left: -width / 2,
+          top: -height / 2,
+          scaleX: scaleX,
+          scaleY: scaleY,
+          originX: 'left',
+          originY: 'top'
+        });
+
+        // Create label at center
+        const label = new fabric.Text(itemData.label, {
+          left: 0,
+          top: 0,
+          fontSize: 11,
+          fill: '#ffffff',
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontWeight: 'bold',
+          originX: 'center',
+          originY: 'center',
+          shadow: new fabric.Shadow({
+            color: 'rgba(0,0,0,0.5)',
+            blur: 3
+          })
+        });
+
+        // Group image and label together with CENTER origin
+        const group = new fabric.Group([img, label], {
+          left: x,
+          top: y,
+          originX: 'center',
+          originY: 'center',
+          selectable: true,
+          evented: true,
+          hasControls: true,
+          hasBorders: true,
+          lockScalingX: false,
+          lockScalingY: false,
+          lockSkewingX: true,
+          lockSkewingY: true,
+          // Professional control styling (matches canvas defaults)
+          borderColor: '#6366F1',
+          borderScaleFactor: 2,
+          borderDashArray: [5, 5],
+          cornerColor: '#6366F1',
+          cornerStrokeColor: '#ffffff',
+          cornerStyle: 'circle',
+          cornerSize: 14,
+          transparentCorners: false,
+          rotatingPointOffset: 40,
+          padding: 0,
+          shadow: new fabric.Shadow({
+            color: 'rgba(0,0,0,0.3)',
+            blur: 10,
+            offsetX: 2,
+            offsetY: 2
+          })
+        });
+
+        // Show corner handles for scaling and rotation handle
+        group.setControlsVisibility({
+          mt: false,
+          mb: false,
+          ml: false,
+          mr: false,
+          bl: true,
+          br: true,
+          tl: true,
+          tr: true,
+          mtr: true
+        });
+
+        // Store custom data on group (SAME as rectangle version)
+        group.customData = {
+          id: itemData.id,
+          itemId: itemData.itemId || itemData.id,
+          label: itemData.label,
+          lengthFt: itemData.lengthFt,
+          widthFt: itemData.widthFt,
+          category: itemData.category,
+          locked: false
+        };
+
+        this.canvas.add(group);
+        this.canvas.renderAll();
+
+        // Emit the same event as rectangle version
+        this.eventBus.emit('item:added', group);
+      },
+      {
+        crossOrigin: 'anonymous'
+      }
+    );
+  }
+
+  /**
+   * Add item with rectangle rendering (existing behavior)
+   * @private
+   */
+  _addItemWithRectangle(itemData, x, y, width, height) {
 
     // Create rectangle centered at origin
     const rect = new fabric.Rect({
@@ -812,6 +947,7 @@ class CanvasManager {
         const width = Helpers.feetToPx(floorPlan.widthFt);
         const height = Helpers.feetToPx(floorPlan.heightFt);
         this.drawGrid(width, height);
+        this.setLayerOrder();
       } else {
         this.gridLines.forEach((line) => this.canvas.remove(line));
         this.gridLines = [];
@@ -827,6 +963,30 @@ class CanvasManager {
     const floorPlan = this.state.get('floorPlan');
     if (floorPlan) {
       this.drawFloorPlan(floorPlan);
+    }
+  }
+
+  /**
+   * Keep core canvas layers (floor plan, grid, entry zone) in correct order
+   * Floor plan base (0) -> grid (1) -> entry zone fill (2) -> label (3)
+   */
+  setLayerOrder() {
+    if (!this.canvas) return;
+
+    if (this.floorPlanRect) {
+      this.floorPlanRect.moveTo(0);
+    }
+
+    if (this.gridLines.length > 0) {
+      this.gridLines.forEach((line) => line.moveTo(1));
+    }
+
+    if (this.entryZoneRect) {
+      this.entryZoneRect.moveTo(2);
+    }
+
+    if (this.entryZoneLabel) {
+      this.entryZoneLabel.moveTo(3);
     }
   }
 }
