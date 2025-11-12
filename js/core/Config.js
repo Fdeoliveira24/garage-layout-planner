@@ -1,4 +1,3 @@
-
 /**
  * Configuration Constants
  * Central configuration for the Garage Layout Planner
@@ -6,9 +5,6 @@
 const Config = {
   // Scaling
   PX_PER_FOOT: 10,
-
-  // Image rendering
-  USE_IMAGES: true,
 
   // Floor Plans (in feet)
   FLOOR_PLANS: [

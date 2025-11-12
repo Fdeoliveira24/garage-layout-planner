@@ -446,37 +446,13 @@ class App {
         <div class="item-category">
           <div class="category-name">${category.name}</div>
           <div class="category-items">
-            ${category.items
-              .map((item) => {
-                // Check if item has palette image and USE_IMAGES is enabled
-                const useImage = Config.USE_IMAGES && item.paletteImage;
-
-                if (useImage) {
-                  // Render with image
-                  return `
-                    <div class="palette-item palette-item-image" data-id="${item.id}">
-                      <img src="${item.paletteImage}" 
-                           alt="${item.label}" 
-                           class="item-preview"
-                           loading="lazy" 
-                           decoding="async"
-                           onerror="this.style.display='none'; this.parentElement.classList.add('image-failed');">
-                      <div class="item-label">${item.label}</div>
-                      <div class="item-size">${item.lengthFt}' × ${item.widthFt}'</div>
-                    </div>
-                  `;
-                } else {
-                  // Render with colored box (original behavior)
-                  return `
-                    <div class="palette-item" data-id="${item.id}" 
-                         style="background-color: ${item.color}20; border-color: ${item.color}">
-                      <div class="item-label">${item.label}</div>
-                      <div class="item-size">${item.lengthFt}' × ${item.widthFt}'</div>
-                    </div>
-                  `;
-                }
-              })
-              .join('')}
+            ${category.items.map((item) => `
+              <div class="palette-item" data-id="${item.id}" 
+                   style="background-color: ${item.color}20; border-color: ${item.color}">
+                <div class="item-label">${item.label}</div>
+                <div class="item-size">${item.lengthFt}' × ${item.widthFt}'</div>
+              </div>
+            `).join('')}
           </div>
         </div>
       `;
