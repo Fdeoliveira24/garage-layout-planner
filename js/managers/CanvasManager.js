@@ -548,6 +548,7 @@ class CanvasManager {
 
     console.log('[CanvasManager] addItem called with:', {
       id: itemData.id,
+      itemId: itemData.itemId,
       label: itemData.label,
       hasCanvasImage: !!itemData.canvasImage,
       canvasImage: itemData.canvasImage,
@@ -555,12 +556,14 @@ class CanvasManager {
     });
 
     // Check if we should use image rendering for this item
-    const useImage = Config.USE_IMAGES && itemData.canvasImage && itemData.id === 'rv-26';
+    // Use itemId (template ID) instead of id (unique instance ID)
+    const useImage = Config.USE_IMAGES && itemData.canvasImage && itemData.itemId === 'rv-26';
 
     console.log('[CanvasManager] useImage decision:', useImage, {
       configCheck: Config.USE_IMAGES,
       imageCheck: !!itemData.canvasImage,
-      idCheck: itemData.id === 'rv-26'
+      idCheck: itemData.itemId === 'rv-26',
+      itemId: itemData.itemId
     });
 
     if (useImage) {
