@@ -377,6 +377,9 @@ class CanvasManager {
     if (this.entryZoneLabel) {
       this.canvas.remove(this.entryZoneLabel);
     }
+    if (this.doorRect) {
+      this.canvas.remove(this.doorRect);
+    }
 
     const width = Helpers.feetToPx(floorPlan.widthFt);
     const height = Helpers.feetToPx(floorPlan.heightFt);
@@ -457,6 +460,30 @@ class CanvasManager {
     this.canvas.add(this.floorPlanRect);
     this.canvas.add(this.entryZoneRect);
     this.canvas.add(this.entryZoneLabel);
+
+    // Draw door outline if door dimensions are provided
+    if (floorPlan.doorWidth && floorPlan.doorHeight) {
+      const doorWidth = Helpers.feetToPx(floorPlan.doorWidth);
+      const doorHeight = Helpers.feetToPx(floorPlan.doorHeight);
+      
+      // Position door centered at the bottom (entry zone)
+      const doorLeft = (width - doorWidth) / 2;
+      const doorTop = height - doorHeight;
+
+      this.doorRect = new fabric.Rect({
+        left: doorLeft,
+        top: doorTop,
+        width: doorWidth,
+        height: doorHeight,
+        fill: 'transparent',
+        stroke: '#FF6B00',
+        strokeWidth: 3,
+        selectable: false,
+        evented: false
+      });
+
+      this.canvas.add(this.doorRect);
+    }
 
     // Draw grid if enabled
     if (this.state.get('settings.showGrid')) {

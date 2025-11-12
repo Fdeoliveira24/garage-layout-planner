@@ -9,13 +9,69 @@ const Config = {
 
   // Floor Plans (in feet)
   FLOOR_PLANS: [
-    { id: 'fp-unit-a', widthFt: 22, heightFt: 55, name: "Units A - 22'×55'" },
-    { id: 'fp-unit-b', widthFt: 15, heightFt: 55, name: "Units B - 15'×55'" },
-    { id: 'fp-unit-c', widthFt: 15, heightFt: 55, name: "Units C - 15'×55'" },
-    { id: 'fp-unit-d', widthFt: 15, heightFt: 50, name: "Units D - 15'×50'" },
-    { id: 'fp-unit-e', widthFt: 14, heightFt: 35, name: "Units E - 14'×35'" },
-    { id: 'fp-unit-f', widthFt: 18, heightFt: 50, name: "Units F - 18'×50'" },
-    { id: 'fp-unit-h', widthFt: 15, heightFt: 50, name: "Units H - 15'×50'" }
+    {
+      id: 'fp-unit-a',
+      widthFt: 22,
+      heightFt: 55,
+      name: "Units A - 22'×55'",
+      doorWidth: 14,
+      doorHeight: 14,
+      building: 'A'
+    },
+    {
+      id: 'fp-unit-b',
+      widthFt: 15,
+      heightFt: 55,
+      name: "Units B - 15'×55'",
+      doorWidth: 13,
+      doorHeight: 14,
+      building: 'B'
+    },
+    {
+      id: 'fp-unit-c',
+      widthFt: 15,
+      heightFt: 55,
+      name: "Units C - 15'×55'",
+      doorWidth: 13,
+      doorHeight: 14,
+      building: 'C'
+    },
+    {
+      id: 'fp-unit-d',
+      widthFt: 15,
+      heightFt: 50,
+      name: "Units D - 15'×50'",
+      doorWidth: 13,
+      doorHeight: 14,
+      building: 'D'
+    },
+    {
+      id: 'fp-unit-e',
+      widthFt: 14,
+      heightFt: 35,
+      name: "Units E - 14'×35'",
+      doorWidth: 12,
+      doorHeight: 12,
+      building: 'E'
+    },
+    {
+      id: 'fp-unit-f',
+      widthFt: 18,
+      heightFt: 50,
+      name: "Units F - 18'×50'",
+      doorWidth: 14,
+      doorHeight: 14,
+      building: 'F'
+    },
+    {
+      id: 'fp-unit-h',
+      widthFt: 15,
+      heightFt: 50,
+      name: "Units H - 15'×50'",
+      doorWidth: 13,
+      doorHeight: 14,
+      building: 'H'
+    }
   ],
 
   // Canvas
