@@ -564,18 +564,32 @@ class CanvasManager {
    * @private
    */
   _addItemWithImage(itemData, x, y, width, height) {
+    console.log(`[CanvasManager] Loading image for ${itemData.id}: ${itemData.canvasImage}`);
+    
     fabric.Image.fromURL(
       itemData.canvasImage,
-      (img) => {
-        if (!img || !img.width || !img.height) {
-          console.warn(`[CanvasManager] Failed to load image for ${itemData.id}, falling back to rectangle`);
+      (img, isError) => {
+        if (isError) {
+          console.error(`[CanvasManager] Error loading image for ${itemData.id}:`, isError);
+          console.warn(`[CanvasManager] Falling back to rectangle for ${itemData.id}`);
           this._addItemWithRectangle(itemData, x, y, width, height);
           return;
         }
 
+        if (!img || !img.width || !img.height) {
+          console.warn(`[CanvasManager] Invalid image loaded for ${itemData.id}, falling back to rectangle`);
+          console.log('[CanvasManager] Image object:', img);
+          this._addItemWithRectangle(itemData, x, y, width, height);
+          return;
+        }
+
+        console.log(`[CanvasManager] Image loaded successfully for ${itemData.id}, dimensions: ${img.width}x${img.height}`);
+
         // Scale image to match item dimensions
         const scaleX = width / img.width;
         const scaleY = height / img.height;
+
+        console.log(`[CanvasManager] Scaling image: scaleX=${scaleX}, scaleY=${scaleY}, target: ${width}x${height}`);
 
         // Position image centered at origin
         img.set({
@@ -662,6 +676,8 @@ class CanvasManager {
 
         this.canvas.add(group);
         this.canvas.renderAll();
+
+        console.log(`[CanvasManager] Image-based item added successfully for ${itemData.id}`);
 
         // Emit the same event as rectangle version
         this.eventBus.emit('item:added', group);
