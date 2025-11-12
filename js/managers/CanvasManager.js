@@ -377,9 +377,9 @@ class CanvasManager {
     if (this.entryZoneLabel) {
       this.canvas.remove(this.entryZoneLabel);
     }
-    if (this.doorRect) {
-      this.canvas.remove(this.doorRect);
-      this.doorRect = null;
+    if (this.entryDividerLine) {
+      this.canvas.remove(this.entryDividerLine);
+      this.entryDividerLine = null;
     }
     if (this.doorLabel) {
       this.canvas.remove(this.doorLabel);
@@ -466,51 +466,39 @@ class CanvasManager {
     this.canvas.add(this.entryZoneRect);
     this.canvas.add(this.entryZoneLabel);
 
-    // Draw door outline within entry zone (if floor plan has door dimensions)
-    if (floorPlan.doorWidth && floorPlan.doorHeight) {
-      const doorWidthPx = floorPlan.doorWidth * Config.PX_PER_FOOT;
-      const doorHeightPx = floorPlan.doorHeight * Config.PX_PER_FOOT;
-
-      // Center door horizontally in unit
-      const doorLeft = (width - doorWidthPx) / 2;
-
-      // Position door at entry zone (bottom of unit)
-      const doorTop = height - entryHeight;
-
-      // Door rectangle (blue outline)
-      this.doorRect = new fabric.Rect({
-        left: doorLeft,
-        top: doorTop,
-        width: doorWidthPx,
-        height: doorHeightPx,
-        fill: 'rgba(33, 150, 243, 0.1)', // Light blue fill
-        stroke: '#2196F3', // Blue outline
+    // Horizontal divider line at entry zone boundary
+    const dividerY = height - entryHeight;
+    
+    this.entryDividerLine = new fabric.Line(
+      [0, dividerY, width, dividerY],
+      {
+        stroke: '#2196F3',
         strokeWidth: 2,
-        strokeDashArray: [8, 4], // Dashed line
+        strokeDashArray: [10, 5],
         selectable: false,
         evented: false
-      });
-
-      // Door label
-      this.doorLabel = new fabric.Text(
-        `${floorPlan.doorWidth}' × ${floorPlan.doorHeight}' DOOR`,
-        {
-          left: width / 2,
-          top: doorTop + doorHeightPx / 2,
-          fontSize: 11,
-          fill: '#2196F3',
-          fontWeight: 'bold',
-          fontFamily: 'Arial, sans-serif',
-          originX: 'center',
-          originY: 'center',
-          selectable: false,
-          evented: false
-        }
-      );
-
-      this.canvas.add(this.doorRect);
-      this.canvas.add(this.doorLabel);
-    }
+      }
+    );
+    
+    // Door label in entry zone
+    const doorWidth = floorPlan.doorWidth || 14;
+    const doorHeight = floorPlan.doorHeight || 14;
+    
+    this.doorLabel = new fabric.Text(`DOOR ${doorWidth}' × ${doorHeight}'`, {
+      left: width / 2,
+      top: dividerY + entryHeight / 2,
+      fontSize: 14,
+      fill: '#1976D2',
+      fontWeight: 'bold',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      originX: 'center',
+      originY: 'center',
+      selectable: false,
+      evented: false
+    });
+    
+    this.canvas.add(this.entryDividerLine);
+    this.canvas.add(this.doorLabel);
 
     // Draw grid if enabled
     if (this.state.get('settings.showGrid')) {

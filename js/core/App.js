@@ -443,14 +443,15 @@ class App {
     container.innerHTML = floorPlans
       .map((fp) => {
         const doorInfo =
-          fp.doorWidthFt && fp.doorHeightFt
-            ? `Door: ${fp.doorWidthFt}' × ${fp.doorHeightFt}'`
+          fp.doorWidth && fp.doorHeight
+            ? `Door: ${fp.doorWidth}' × ${fp.doorHeight}'`
             : fp.description || '';
+        const area = fp.area || (fp.widthFt * fp.heightFt);
         return `
       <div class="floorplan-item ${currentId === fp.id ? 'selected' : ''}" data-id="${fp.id}">
         <div class="floorplan-name">${fp.name}</div>
         <div class="floorplan-info">${doorInfo}</div>
-        <div class="floorplan-area">${fp.area} sq ft</div>
+        <div class="floorplan-area">${area} sq ft</div>
       </div>
     `;
       })

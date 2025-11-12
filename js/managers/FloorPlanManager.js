@@ -1,4 +1,4 @@
-/* global FloorPlans, Validation */
+/* global Validation, Config */
 
 /**
  * Floor Plan Manager
@@ -15,7 +15,7 @@ class FloorPlanManager {
    * Set active floor plan
    */
   setFloorPlan(floorPlanId) {
-    const floorPlan = FloorPlans.getById(floorPlanId);
+    const floorPlan = Config.FLOOR_PLANS.find(fp => fp.id === floorPlanId);
 
     if (!floorPlan) {
       console.error('Floor plan not found:', floorPlanId);
@@ -57,7 +57,7 @@ class FloorPlanManager {
    * Get all floor plan templates
    */
   getAllFloorPlans() {
-    return FloorPlans.getAll();
+    return Config.FLOOR_PLANS;
   }
 
   /**
