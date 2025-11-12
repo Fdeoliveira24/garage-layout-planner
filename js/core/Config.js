@@ -3,18 +3,19 @@
  * Central configuration for the Garage Layout Planner
  */
 const Config = {
+  USE_IMAGES: true,
   // Scaling
   PX_PER_FOOT: 10,
 
   // Floor Plans (in feet)
   FLOOR_PLANS: [
-    { id: 'fp-20x25', widthFt: 20, heightFt: 25, name: "20' × 25'" },
-    { id: 'fp-20x30', widthFt: 20, heightFt: 30, name: "20' × 30'" },
-    { id: 'fp-20x40', widthFt: 20, heightFt: 40, name: "20' × 40'" },
-    { id: 'fp-24x30', widthFt: 24, heightFt: 30, name: "24' × 30'" },
-    { id: 'fp-24x40', widthFt: 24, heightFt: 40, name: "24' × 40'" },
-    { id: 'fp-24x48', widthFt: 24, heightFt: 48, name: "24' × 48'" },
-    { id: 'fp-24x50', widthFt: 24, heightFt: 50, name: "24' × 50'" }
+    { id: 'fp-unit-a', widthFt: 22, heightFt: 55, name: "Units A - 22'×55'" },
+    { id: 'fp-unit-b', widthFt: 15, heightFt: 55, name: "Units B - 15'×55'" },
+    { id: 'fp-unit-c', widthFt: 15, heightFt: 55, name: "Units C - 15'×55'" },
+    { id: 'fp-unit-d', widthFt: 15, heightFt: 50, name: "Units D - 15'×50'" },
+    { id: 'fp-unit-e', widthFt: 14, heightFt: 35, name: "Units E - 14'×35'" },
+    { id: 'fp-unit-f', widthFt: 18, heightFt: 50, name: "Units F - 18'×50'" },
+    { id: 'fp-unit-h', widthFt: 15, heightFt: 50, name: "Units H - 15'×50'" }
   ],
 
   // Canvas

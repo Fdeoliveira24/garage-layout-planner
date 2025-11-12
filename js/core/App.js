@@ -443,19 +443,32 @@ class App {
       .map((catName) => {
         const category = Items.categories[catName];
         return `
-        <div class="item-category">
-          <div class="category-name">${category.name}</div>
-          <div class="category-items">
-            ${category.items.map((item) => `
-              <div class="palette-item" data-id="${item.id}" 
-                   style="background-color: ${item.color}20; border-color: ${item.color}">
-                <div class="item-label">${item.label}</div>
-                <div class="item-size">${item.lengthFt}' × ${item.widthFt}'</div>
-              </div>
-            `).join('')}
+          <div class="item-category">
+            <div class="category-name">${category.name}</div>
+            <div class="category-items">
+              ${category.items
+    .map((item) => {
+      const hasImage = Config.USE_IMAGES && item.paletteImage;
+      if (hasImage) {
+        return `
+                      <div class="palette-item" data-id="${item.id}" style="background-color: ${item.color}20; border-color: ${item.color}">
+                        <img src="${item.paletteImage}" loading="lazy" decoding="async" class="item-preview" style="display:block;max-width:60px;margin:auto;">
+                        <div class="item-label">${item.label}</div>
+                        <div class="item-size">${item.lengthFt}' × ${item.widthFt}'</div>
+                      </div>
+                    `;
+      }
+      return `
+                    <div class="palette-item" data-id="${item.id}" style="background-color: ${item.color}20; border-color: ${item.color}">
+                      <div class="item-label">${item.label}</div>
+                      <div class="item-size">${item.lengthFt}' × ${item.widthFt}'</div>
+                    </div>
+                  `;
+    })
+    .join('')}
+            </div>
           </div>
-        </div>
-      `;
+        `;
       })
       .join('');
 

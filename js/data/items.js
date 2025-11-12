@@ -14,7 +14,9 @@ const Items = {
           lengthFt: 15,
           widthFt: 6,
           color: '#FF5722',
-          category: 'vehicles'
+          category: 'vehicles',
+          paletteImage: 'assets/images/items/palette/sports-car-side.png',
+          canvasImage: 'assets/images/items/canvas/sports-car-top.png'
         },
         {
           id: 'sedan',
@@ -22,7 +24,9 @@ const Items = {
           lengthFt: 16,
           widthFt: 6,
           color: '#2196F3',
-          category: 'vehicles'
+          category: 'vehicles',
+          paletteImage: 'assets/images/items/palette/sedan-side.png',
+          canvasImage: 'assets/images/items/canvas/sedan-top.png'
         },
         {
           id: 'pickup',
@@ -30,7 +34,9 @@ const Items = {
           lengthFt: 19,
           widthFt: 6.5,
           color: '#4CAF50',
-          category: 'vehicles'
+          category: 'vehicles',
+          paletteImage: 'assets/images/items/palette/pickup-side.png',
+          canvasImage: 'assets/images/items/canvas/pickup-top.png'
         },
         {
           id: 'suv',
@@ -38,7 +44,9 @@ const Items = {
           lengthFt: 17,
           widthFt: 6.5,
           color: '#9C27B0',
-          category: 'vehicles'
+          category: 'vehicles',
+          paletteImage: 'assets/images/items/palette/suv-side.png',
+          canvasImage: 'assets/images/items/canvas/suv-top.png'
         },
         {
           id: 'motorcycle',
@@ -46,15 +54,9 @@ const Items = {
           lengthFt: 7,
           widthFt: 3,
           color: '#FF9800',
-          category: 'vehicles'
-        },
-        {
-          id: 'compact-car',
-          label: 'Compact Car',
-          lengthFt: 14,
-          widthFt: 5.5,
-          color: '#00BCD4',
-          category: 'vehicles'
+          category: 'vehicles',
+          paletteImage: 'assets/images/items/palette/motorcycle-side.png',
+          canvasImage: 'assets/images/items/canvas/motorcycle-top.png'
         },
         {
           id: 'van',
@@ -62,7 +64,9 @@ const Items = {
           lengthFt: 18,
           widthFt: 6.5,
           color: '#795548',
-          category: 'vehicles'
+          category: 'vehicles',
+          paletteImage: 'assets/images/items/palette/van-side.png',
+          canvasImage: 'assets/images/items/canvas/van-top.png'
         }
       ]
     },
@@ -75,7 +79,9 @@ const Items = {
           lengthFt: 20,
           widthFt: 7,
           color: '#03A9F4',
-          category: 'recreational'
+          category: 'recreational',
+          paletteImage: 'assets/images/items/palette/boat-trailer-side.png',
+          canvasImage: 'assets/images/items/canvas/boat-trailer-top.png'
         },
         {
           id: 'rv-26',
@@ -84,8 +90,8 @@ const Items = {
           widthFt: 8,
           color: '#8BC34A',
           category: 'recreational',
-          paletteImage: '/assets/images/items/palette/RV-34-Ft-side.jpg',
-          canvasImage: '/assets/images/items/canvas/RV-34-Ft-top.jpg'
+          paletteImage: 'assets/images/items/palette/rv-26-side.png',
+          canvasImage: 'assets/images/items/canvas/rv-26-top.png'
         },
         {
           id: 'rv-34',
@@ -93,7 +99,9 @@ const Items = {
           lengthFt: 34,
           widthFt: 8.5,
           color: '#CDDC39',
-          category: 'recreational'
+          category: 'recreational',
+          paletteImage: 'assets/images/items/palette/rv-34-side.png',
+          canvasImage: 'assets/images/items/canvas/rv-34-top.png'
         },
         {
           id: 'jet-ski-trailer',
@@ -101,7 +109,9 @@ const Items = {
           lengthFt: 12,
           widthFt: 5,
           color: '#00ACC1',
-          category: 'recreational'
+          category: 'recreational',
+          paletteImage: 'assets/images/items/palette/jet-ski-trailer-side.png',
+          canvasImage: 'assets/images/items/canvas/jet-ski-trailer-top.png'
         },
         {
           id: 'atv',
@@ -109,7 +119,9 @@ const Items = {
           lengthFt: 7,
           widthFt: 4,
           color: '#FFC107',
-          category: 'recreational'
+          category: 'recreational',
+          paletteImage: 'assets/images/items/palette/atv-side.png',
+          canvasImage: 'assets/images/items/canvas/atv-top.png'
         }
       ]
     },
@@ -122,7 +134,9 @@ const Items = {
           lengthFt: 4,
           widthFt: 2,
           color: '#607D8B',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'workbench',
@@ -130,7 +144,9 @@ const Items = {
           lengthFt: 6,
           widthFt: 2.5,
           color: '#795548',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'storage-box',
@@ -138,7 +154,9 @@ const Items = {
           lengthFt: 3,
           widthFt: 3,
           color: '#9E9E9E',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'tool-cabinet',
@@ -146,7 +164,9 @@ const Items = {
           lengthFt: 5,
           widthFt: 2,
           color: '#E53935',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'bike-rack',
@@ -154,7 +174,9 @@ const Items = {
           lengthFt: 6,
           widthFt: 2,
           color: '#1976D2',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'freezer',
@@ -162,7 +184,9 @@ const Items = {
           lengthFt: 5,
           widthFt: 2.5,
           color: '#FFFFFF',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'ladder-rack',
@@ -170,7 +194,9 @@ const Items = {
           lengthFt: 8,
           widthFt: 1.5,
           color: '#FFB300',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'pegboard',
@@ -178,7 +204,9 @@ const Items = {
           lengthFt: 4,
           widthFt: 0.5,
           color: '#8D6E63',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         },
         {
           id: 'small-shelf',
@@ -186,7 +214,9 @@ const Items = {
           lengthFt: 3,
           widthFt: 1.5,
           color: '#78909C',
-          category: 'storage'
+          category: 'storage',
+          paletteImage: '',
+          canvasImage: ''
         }
       ]
     }

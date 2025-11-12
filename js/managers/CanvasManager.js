@@ -262,7 +262,8 @@ class CanvasManager {
     if (zoom > 2) zoom = 2;
     if (zoom < 0.1) zoom = 0.1;
 
-    this.canvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+    const canvasPoint = new fabric.Point(opt.e.offsetX, opt.e.offsetY);
+    this.canvas.zoomToPoint(canvasPoint, zoom);
 
     // User manually zoomed - exit auto-fit mode
     this.isAutoFitMode = false;
@@ -541,10 +542,42 @@ class CanvasManager {
 
   /**
    * Add item to canvas
+   * Always returns a group immediately (synchronous)
+   * If image available, swaps rectangle with image asynchronously
    */
   addItem(itemData, x, y) {
+    // Create base group with rectangle immediately
+    const group = this._createBaseGroup(itemData, x, y);
+
+    // Add to canvas and render
+    this.canvas.add(group);
+    this.canvas.renderAll();
+
+    // If image available, start async load to swap rectangle with image
+    if (Config.USE_IMAGES && itemData.canvasImage) {
+      fabric.Image.fromURL(
+        itemData.canvasImage,
+        (img) => {
+          if (!img) {
+            console.warn('[CanvasManager] Failed to load image for item:', itemData.id);
+            return; // Keep rectangle fallback
+          }
+          this._swapGroupImage(group, img, itemData);
+        },
+        { crossOrigin: 'anonymous' }
+      );
+    }
+
+    return group;
+  }
+
+  /**
+   * Create base group with rectangle and label
+   * @private
+   */
+  _createBaseGroup(itemData, x, y) {
     const width = Helpers.feetToPx(itemData.widthFt);
-    const height = Helpers.feetToPx(itemData.lengthFt); // Vertical by default
+    const height = Helpers.feetToPx(itemData.lengthFt);
 
     // Create rectangle centered at origin
     const rect = new fabric.Rect({
@@ -589,7 +622,6 @@ class CanvasManager {
       lockScalingY: false,
       lockSkewingX: true,
       lockSkewingY: true,
-      // Professional control styling (matches canvas defaults)
       borderColor: '#6366F1',
       borderScaleFactor: 2,
       borderDashArray: [5, 5],
@@ -608,34 +640,56 @@ class CanvasManager {
       })
     });
 
-    // Show corner handles for scaling and rotation handle
-    // Hide middle edge handles to prevent non-uniform scaling
     group.setControlsVisibility({
-      mt: false, // middle top
-      mb: false, // middle bottom
-      ml: false, // middle left
-      mr: false, // middle right
-      bl: true, // bottom left - SHOW for scaling
-      br: true, // bottom right - SHOW for scaling
-      tl: true, // top left - SHOW for scaling
-      tr: true, // top right - SHOW for scaling
-      mtr: true // rotation handle - KEEP VISIBLE
+      mt: false,
+      mb: false,
+      ml: false,
+      mr: false,
+      bl: true,
+      br: true,
+      tl: true,
+      tr: true,
+      mtr: true
     });
 
     // Store custom data on group
-    group.customData = {
-      id: itemData.id,
-      itemId: itemData.itemId || itemData.id,
-      label: itemData.label,
-      lengthFt: itemData.lengthFt,
-      widthFt: itemData.widthFt,
-      category: itemData.category,
-      locked: false
-    };
-
-    this.canvas.add(group);
+    group.customData = { ...itemData };
 
     return group;
+  }
+
+  /**
+   * Swap rectangle in group with loaded image
+   * @private
+   */
+  _swapGroupImage(group, img, itemData) {
+    if (!group || !img) return;
+
+    const width = Helpers.feetToPx(itemData.widthFt);
+    const height = Helpers.feetToPx(itemData.lengthFt);
+
+    // Scale image to match dimensions
+    img.set({
+      left: -width / 2,
+      top: -height / 2,
+      originX: 'left',
+      originY: 'top'
+    });
+    img.scaleToWidth(width);
+    img.scaleY = height / img.height;
+
+    // Find and remove the rectangle (first child, index 0)
+    const rectChild = group.item(0);
+    if (rectChild && rectChild.type === 'rect') {
+      group.remove(rectChild);
+    }
+
+    // Add image at the beginning (so label stays on top)
+    group.insertAt(img, 0);
+    group.addWithUpdate();
+
+    // Re-render canvas
+    this.canvas.renderAll();
   }
 
   /**

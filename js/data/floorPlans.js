@@ -5,67 +5,67 @@
 const FloorPlans = {
   templates: [
     {
-      id: 'fp-20x25',
-      name: "20' × 25'",
-      widthFt: 20,
-      heightFt: 25,
+      id: 'fp-unit-a',
+      name: "Units A - 22' × 55'",
+      widthFt: 22,
+      heightFt: 55,
       type: 'rectangular',
-      area: 500, // sq ft
-      description: 'Compact single-car garage'
+      area: 1210,
+      description: 'Primary RV storage bay'
     },
     {
-      id: 'fp-20x30',
-      name: "20' × 30'",
-      widthFt: 20,
-      heightFt: 30,
+      id: 'fp-unit-b',
+      name: "Units B - 15' × 55'",
+      widthFt: 15,
+      heightFt: 55,
       type: 'rectangular',
-      area: 600,
-      description: 'Single-car with storage'
+      area: 825,
+      description: 'Standard long bay'
     },
     {
-      id: 'fp-20x40',
-      name: "20' × 40'",
-      widthFt: 20,
-      heightFt: 40,
+      id: 'fp-unit-c',
+      name: "Units C - 15' × 55'",
+      widthFt: 15,
+      heightFt: 55,
       type: 'rectangular',
-      area: 800,
-      description: 'Deep single-car garage'
+      area: 825,
+      description: 'Standard long bay'
     },
     {
-      id: 'fp-24x30',
-      name: "24' × 30'",
-      widthFt: 24,
-      heightFt: 30,
-      type: 'rectangular',
-      area: 720,
-      description: 'Standard two-car garage'
-    },
-    {
-      id: 'fp-24x40',
-      name: "24' × 40'",
-      widthFt: 24,
-      heightFt: 40,
-      type: 'rectangular',
-      area: 960,
-      description: 'Two-car with workshop space'
-    },
-    {
-      id: 'fp-24x48',
-      name: "24' × 48'",
-      widthFt: 24,
-      heightFt: 48,
-      type: 'rectangular',
-      area: 1152,
-      description: 'Large two-car with storage'
-    },
-    {
-      id: 'fp-24x50',
-      name: "24' × 50'",
-      widthFt: 24,
+      id: 'fp-unit-d',
+      name: "Units D - 15' × 50'",
+      widthFt: 15,
       heightFt: 50,
       type: 'rectangular',
-      area: 1200,
-      description: 'Extra-deep two-car garage'
+      area: 750,
+      description: 'Medium bay configuration'
+    },
+    {
+      id: 'fp-unit-e',
+      name: "Units E - 14' × 35'",
+      widthFt: 14,
+      heightFt: 35,
+      type: 'rectangular',
+      area: 490,
+      description: 'Compact vehicle bay'
+    },
+    {
+      id: 'fp-unit-f',
+      name: "Units F - 18' × 50'",
+      widthFt: 18,
+      heightFt: 50,
+      type: 'rectangular',
+      area: 900,
+      description: 'Wide/long bay'
+    },
+    {
+      id: 'fp-unit-h',
+      name: "Units H - 15' × 50'",
+      widthFt: 15,
+      heightFt: 50,
+      type: 'rectangular',
+      area: 750,
+      description: 'Alternate medium bay'
     }
   ],
 
