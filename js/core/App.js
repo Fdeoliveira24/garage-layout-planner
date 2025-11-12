@@ -1425,6 +1425,12 @@ class App {
    * Saves application state every 30 seconds
    */
   setupAutosave() {
+    // Skip autosave setup if storage is not available
+    if (!Storage.isAvailable) {
+      console.warn('[App] Autosave disabled - persistent storage not available');
+      return;
+    }
+
     // [App] Setting up autosave (interval: 30s)
     this.autosaveInterval = setInterval(() => {
       this.autosave();
@@ -1437,6 +1443,11 @@ class App {
    * Does NOT save canvas viewport (zoom/pan)
    */
   autosave() {
+    // Skip if storage not available
+    if (!Storage.isAvailable) {
+      return;
+    }
+
     try {
       const state = this.state.getState();
 
@@ -1465,6 +1476,12 @@ class App {
    * Validates data and resets viewport after loading
    */
   loadAutosave() {
+    // Skip if storage not available
+    if (!Storage.isAvailable) {
+      console.log('[App] Autosave unavailable - persistent storage not available');
+      return false;
+    }
+
     try {
       const savedData = Storage.load(Config.STORAGE_KEYS.autosave);
 
@@ -1573,6 +1590,12 @@ class App {
    * Save layout
    */
   async saveLayout() {
+    // Check if storage is available
+    if (!Storage.isAvailable) {
+      Modal.showError('Cannot save layout - persistent storage is not available in your browser');
+      return;
+    }
+
     const name = await Modal.showPrompt('Save Layout', 'Enter layout name:');
     if (!name) return;
 
@@ -1587,10 +1610,13 @@ class App {
       thumbnail: this.exportManager.generateThumbnail()
     });
 
-    Storage.save(Config.STORAGE_KEYS.layouts, layouts);
-    Modal.showSuccess('Layout saved successfully!');
-
-    this.renderSavedLayouts();
+    const saved = Storage.save(Config.STORAGE_KEYS.layouts, layouts);
+    if (saved) {
+      Modal.showSuccess('Layout saved successfully!');
+      this.renderSavedLayouts();
+    } else {
+      Modal.showError('Failed to save layout - storage error');
+    }
   }
 
   /**
@@ -1656,6 +1682,12 @@ class App {
    * Validates data and resets viewport
    */
   async loadLayout(layoutId) {
+    // Check if storage is available
+    if (!Storage.isAvailable) {
+      Modal.showError('Cannot load layout - persistent storage is not available in your browser');
+      return;
+    }
+
     try {
       const layouts = Storage.load(Config.STORAGE_KEYS.layouts) || [];
       const layout = layouts.find((l) => l.id === layoutId);
@@ -1711,12 +1743,22 @@ class App {
    * Delete a saved layout
    */
   deleteLayout(layoutId) {
+    // Check if storage is available
+    if (!Storage.isAvailable) {
+      Modal.showError('Cannot delete layout - persistent storage is not available in your browser');
+      return;
+    }
+
     let layouts = Storage.load(Config.STORAGE_KEYS.layouts) || [];
     layouts = layouts.filter((l) => l.id !== layoutId);
-    Storage.save(Config.STORAGE_KEYS.layouts, layouts);
+    const saved = Storage.save(Config.STORAGE_KEYS.layouts, layouts);
 
-    this.renderSavedLayouts();
-    Modal.showSuccess('Layout deleted');
+    if (saved) {
+      this.renderSavedLayouts();
+      Modal.showSuccess('Layout deleted');
+    } else {
+      Modal.showError('Failed to delete layout - storage error');
+    }
   }
 }
 
