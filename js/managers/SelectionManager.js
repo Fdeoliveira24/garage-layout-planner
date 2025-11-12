@@ -202,6 +202,12 @@ class SelectionManager {
     });
 
     this.canvas.renderAll();
+    
+    // Emit canvas:object:modified for each moved item so history, validation, and state updates occur
+    selected.forEach((item) => {
+      this.eventBus.emit('canvas:object:modified', item);
+    });
+    
     this.eventBus.emit('items:moved', selected);
   }
 

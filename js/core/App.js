@@ -186,10 +186,18 @@ class App {
     // History events
     this.eventBus.on('history:undo', () => {
       this.refreshCanvas();
+      this.renderFloorPlanList();
+      this.renderSavedLayouts();
+      this.updateInfoPanel();
+      this.syncViewDropdownUI();
     });
 
     this.eventBus.on('history:redo', () => {
       this.refreshCanvas();
+      this.renderFloorPlanList();
+      this.renderSavedLayouts();
+      this.updateInfoPanel();
+      this.syncViewDropdownUI();
     });
 
     // Zoom events
@@ -508,6 +516,9 @@ class App {
           // Clear everything
           this.state.reset();
           this.canvasManager.clear();
+
+          // Clear history stack to prevent undoing back to old layout
+          this.historyManager.clear();
 
           // CRITICAL: Clear autosave from localStorage immediately
           Storage.remove(Config.STORAGE_KEYS.autosave);
@@ -992,6 +1003,9 @@ class App {
           // Clear everything (same as desktop version)
           this.state.reset();
           this.canvasManager.clear();
+
+          // Clear history stack to prevent undoing back to old layout
+          this.historyManager.clear();
 
           // CRITICAL: Clear autosave from localStorage immediately
           Storage.remove(Config.STORAGE_KEYS.autosave);
