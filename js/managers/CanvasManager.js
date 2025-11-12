@@ -543,79 +543,38 @@ class CanvasManager {
    * Add item to canvas
    */
   addItem(itemData, x, y) {
-    const width = Helpers.feetToPx(itemData.widthFt);
-    const height = Helpers.feetToPx(itemData.lengthFt); // Vertical by default
-
-    console.log('[CanvasManager] addItem called with:', {
-      id: itemData.id,
-      itemId: itemData.itemId,
-      label: itemData.label,
-      hasCanvasImage: !!itemData.canvasImage,
-      canvasImage: itemData.canvasImage,
-      USE_IMAGES: Config.USE_IMAGES
-    });
-
-    // Check if we should use image rendering for this item
-    // Use itemId (template ID) instead of id (unique instance ID)
-    const useImage = Config.USE_IMAGES && itemData.canvasImage && itemData.itemId === 'rv-26';
-
-    console.log('[CanvasManager] useImage decision:', useImage, {
-      configCheck: Config.USE_IMAGES,
-      imageCheck: !!itemData.canvasImage,
-      idCheck: itemData.itemId === 'rv-26',
-      itemId: itemData.itemId
-    });
-
-    if (useImage) {
-      console.log('[CanvasManager] Routing to _addItemWithImage');
-      // Load image and create image-based group
-      this._addItemWithImage(itemData, x, y, width, height);
-      return; // Image loading is async, return early
+    // Check if we should use image-based rendering
+    if (Config.USE_IMAGES && itemData.canvasImage) {
+      this._addItemWithImage(itemData, x, y);
+    } else {
+      this._addItemWithRectangle(itemData, x, y);
     }
-
-    console.log('[CanvasManager] Routing to _addItemWithRectangle (fallback)');
-    // Create rectangle-based item (existing behavior)
-    this._addItemWithRectangle(itemData, x, y, width, height);
   }
 
   /**
-   * Add item with image rendering
-   * @private
+   * Add item using image rendering with fallback to rectangle
    */
-  _addItemWithImage(itemData, x, y, width, height) {
-    console.log(`[CanvasManager] Loading image for ${itemData.id}: ${itemData.canvasImage}`);
-    
+  _addItemWithImage(itemData, x, y) {
+    const targetW = itemData.widthFt * Config.PX_PER_FOOT;
+    const targetH = itemData.lengthFt * Config.PX_PER_FOOT;
+
     fabric.Image.fromURL(
       itemData.canvasImage,
-      (img, isError) => {
-        if (isError) {
-          console.error(`[CanvasManager] Error loading image for ${itemData.id}:`, isError);
-          console.warn(`[CanvasManager] Falling back to rectangle for ${itemData.id}`);
-          this._addItemWithRectangle(itemData, x, y, width, height);
+      (img) => {
+        if (!img || !img.getElement()) {
+          console.warn(`[CanvasManager] Failed to load image for ${itemData.id}, falling back to rectangle`);
+          this._addItemWithRectangle(itemData, x, y);
           return;
         }
 
-        if (!img || !img.width || !img.height) {
-          console.warn(`[CanvasManager] Invalid image loaded for ${itemData.id}, falling back to rectangle`);
-          console.log('[CanvasManager] Image object:', img);
-          this._addItemWithRectangle(itemData, x, y, width, height);
-          return;
-        }
+        // Scale image to exact target dimensions
+        img.scaleToWidth(targetW);
+        img.scaleToHeight(targetH);
 
-        console.log(`[CanvasManager] Image loaded successfully for ${itemData.id}, dimensions: ${img.width}x${img.height}`);
-
-        // Scale image to match item dimensions
-        const scaleX = width / img.width;
-        const scaleY = height / img.height;
-
-        console.log(`[CanvasManager] Scaling image: scaleX=${scaleX}, scaleY=${scaleY}, target: ${width}x${height}`);
-
-        // Position image centered at origin
+        // Center the image at origin
         img.set({
-          left: -width / 2,
-          top: -height / 2,
-          scaleX: scaleX,
-          scaleY: scaleY,
+          left: -targetW / 2,
+          top: -targetH / 2,
           originX: 'left',
           originY: 'top'
         });
@@ -650,7 +609,6 @@ class CanvasManager {
           lockScalingY: false,
           lockSkewingX: true,
           lockSkewingY: true,
-          // Professional control styling (matches canvas defaults)
           borderColor: '#6366F1',
           borderScaleFactor: 2,
           borderDashArray: [5, 5],
@@ -682,7 +640,7 @@ class CanvasManager {
           mtr: true
         });
 
-        // Store custom data on group (SAME as rectangle version)
+        // Store custom data on group
         group.customData = {
           id: itemData.id,
           itemId: itemData.itemId || itemData.id,
@@ -695,11 +653,6 @@ class CanvasManager {
 
         this.canvas.add(group);
         this.canvas.renderAll();
-
-        console.log(`[CanvasManager] Image-based item added successfully for ${itemData.id}`);
-
-        // Emit the same event as rectangle version
-        this.eventBus.emit('item:added', group);
       },
       {
         crossOrigin: 'anonymous'
@@ -708,10 +661,11 @@ class CanvasManager {
   }
 
   /**
-   * Add item with rectangle rendering (existing behavior)
-   * @private
+   * Add item using rectangle rendering (original behavior)
    */
-  _addItemWithRectangle(itemData, x, y, width, height) {
+  _addItemWithRectangle(itemData, x, y) {
+    const width = Helpers.feetToPx(itemData.widthFt);
+    const height = Helpers.feetToPx(itemData.lengthFt); // Vertical by default
 
     // Create rectangle centered at origin
     const rect = new fabric.Rect({

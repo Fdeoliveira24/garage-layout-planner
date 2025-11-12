@@ -1,3 +1,4 @@
+
 /**
  * Configuration Constants
  * Central configuration for the Garage Layout Planner
@@ -5,6 +6,9 @@
 const Config = {
   // Scaling
   PX_PER_FOOT: 10,
+
+  // Image rendering
+  USE_IMAGES: true,
 
   // Floor Plans (in feet)
   FLOOR_PLANS: [
@@ -47,9 +51,6 @@ const Config = {
   // Keyboard
   NUDGE_DISTANCE: 2, // pixels
   NUDGE_DISTANCE_LARGE: 10, // pixels with Shift
-
-  // Images
-  USE_IMAGES: true, // Enable image-based rendering for supported items
 
   // Colors
   COLORS: {

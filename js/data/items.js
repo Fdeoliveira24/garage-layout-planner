@@ -84,8 +84,8 @@ const Items = {
           widthFt: 8,
           color: '#8BC34A',
           category: 'recreational',
-          paletteImage: 'assets/images/items/palette/RV-34-Ft-side.jpg',
-          canvasImage: 'assets/images/items/canvas/RV-34-Ft-top.jpg'
+          paletteImage: '/assets/images/items/palette/RV-34-Ft-side.jpg',
+          canvasImage: '/assets/images/items/canvas/RV-34-Ft-top.jpg'
         },
         {
           id: 'rv-34',
