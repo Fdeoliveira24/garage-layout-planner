@@ -5,7 +5,7 @@
 const Config = {
   USE_IMAGES: true,
   // Scaling
-  PX_PER_FOOT: 8,
+  PX_PER_FOOT: 10,
 
   // Floor Plans (in feet)
   FLOOR_PLANS: [
@@ -20,7 +20,7 @@ const Config = {
 
   // Canvas
   CANVAS_PADDING: 50,
-  GRID_SIZE: 8, // 1 foot in pixels (matches PX_PER_FOOT)
+  GRID_SIZE: 10, // 1 foot in pixels
 
   // History
   MAX_HISTORY: 50,
