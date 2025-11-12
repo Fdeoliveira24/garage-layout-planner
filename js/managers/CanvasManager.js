@@ -546,15 +546,31 @@ class CanvasManager {
     const width = Helpers.feetToPx(itemData.widthFt);
     const height = Helpers.feetToPx(itemData.lengthFt); // Vertical by default
 
+    console.log('[CanvasManager] addItem called with:', {
+      id: itemData.id,
+      label: itemData.label,
+      hasCanvasImage: !!itemData.canvasImage,
+      canvasImage: itemData.canvasImage,
+      USE_IMAGES: Config.USE_IMAGES
+    });
+
     // Check if we should use image rendering for this item
     const useImage = Config.USE_IMAGES && itemData.canvasImage && itemData.id === 'rv-26';
 
+    console.log('[CanvasManager] useImage decision:', useImage, {
+      configCheck: Config.USE_IMAGES,
+      imageCheck: !!itemData.canvasImage,
+      idCheck: itemData.id === 'rv-26'
+    });
+
     if (useImage) {
+      console.log('[CanvasManager] Routing to _addItemWithImage');
       // Load image and create image-based group
       this._addItemWithImage(itemData, x, y, width, height);
       return; // Image loading is async, return early
     }
 
+    console.log('[CanvasManager] Routing to _addItemWithRectangle (fallback)');
     // Create rectangle-based item (existing behavior)
     this._addItemWithRectangle(itemData, x, y, width, height);
   }
