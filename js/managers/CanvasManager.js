@@ -13,6 +13,8 @@ class CanvasManager {
     this.floorPlanRect = null;
     this.entryZoneRect = null;
     this.entryZoneLabel = null;
+    this.entryDividerLine = null;
+    this.doorLabel = null;
     this.gridLines = [];
     this.alignmentGuides = [];
     this.emptyStateGroup = null;
@@ -409,7 +411,6 @@ class CanvasManager {
     // Create entry zone
     const entryZonePosition = this.state.get('settings.entryZonePosition') || 'bottom';
     const showEntryBorder = this.state.get('settings.showEntryZoneBorder') !== false;
-    const showEntryLabel = this.state.get('settings.showEntryZoneLabel') !== false;
 
     let entryLeft, entryTop, entryWidth, entryHeight, labelLeft, labelTop;
 
@@ -446,6 +447,7 @@ class CanvasManager {
     });
 
     // Add entry zone label with rotation for vertical positions
+    // Note: Hide entry zone label since we now have door label
     const labelAngle = entryZonePosition === 'left' || entryZonePosition === 'right' ? 90 : 0;
 
     this.entryZoneLabel = new fabric.Text('ENTRY ZONE', {
@@ -459,7 +461,7 @@ class CanvasManager {
       angle: labelAngle,
       selectable: false,
       evented: false,
-      opacity: showEntryLabel ? 0.8 : 0
+      opacity: 0  // Hidden - we show door label instead
     });
 
     this.canvas.add(this.floorPlanRect);
@@ -468,7 +470,7 @@ class CanvasManager {
 
     // Horizontal divider line at entry zone boundary
     const dividerY = height - entryHeight;
-    
+
     this.entryDividerLine = new fabric.Line(
       [0, dividerY, width, dividerY],
       {
@@ -479,11 +481,11 @@ class CanvasManager {
         evented: false
       }
     );
-    
+
     // Door label in entry zone
     const doorWidth = floorPlan.doorWidth || 14;
     const doorHeight = floorPlan.doorHeight || 14;
-    
+
     this.doorLabel = new fabric.Text(`DOOR ${doorWidth}' × ${doorHeight}'`, {
       left: width / 2,
       top: dividerY + entryHeight / 2,
@@ -496,7 +498,7 @@ class CanvasManager {
       selectable: false,
       evented: false
     });
-    
+
     this.canvas.add(this.entryDividerLine);
     this.canvas.add(this.doorLabel);
 
