@@ -11,7 +11,9 @@ const FloorPlans = {
       heightFt: 55,
       type: 'rectangular',
       area: 1210,
-      description: 'Primary RV storage bay'
+      description: "Door: 14' × 14'",
+      doorWidthFt: 14,
+      doorHeightFt: 14
     },
     {
       id: 'fp-unit-b',
@@ -20,7 +22,9 @@ const FloorPlans = {
       heightFt: 55,
       type: 'rectangular',
       area: 825,
-      description: 'Standard long bay'
+      description: "Door: 13' × 14'",
+      doorWidthFt: 13,
+      doorHeightFt: 14
     },
     {
       id: 'fp-unit-c',
@@ -29,7 +33,9 @@ const FloorPlans = {
       heightFt: 55,
       type: 'rectangular',
       area: 825,
-      description: 'Standard long bay'
+      description: "Door: 13' × 14'",
+      doorWidthFt: 13,
+      doorHeightFt: 14
     },
     {
       id: 'fp-unit-d',
@@ -38,7 +44,9 @@ const FloorPlans = {
       heightFt: 50,
       type: 'rectangular',
       area: 750,
-      description: 'Medium bay configuration'
+      description: "Door: 13' × 14'",
+      doorWidthFt: 13,
+      doorHeightFt: 14
     },
     {
       id: 'fp-unit-e',
@@ -47,7 +55,9 @@ const FloorPlans = {
       heightFt: 35,
       type: 'rectangular',
       area: 490,
-      description: 'Compact vehicle bay'
+      description: "Door: 12' × 12'",
+      doorWidthFt: 12,
+      doorHeightFt: 12
     },
     {
       id: 'fp-unit-f',
@@ -56,7 +66,9 @@ const FloorPlans = {
       heightFt: 50,
       type: 'rectangular',
       area: 900,
-      description: 'Wide/long bay'
+      description: "Door: 14' × 14'",
+      doorWidthFt: 14,
+      doorHeightFt: 14
     },
     {
       id: 'fp-unit-h',
@@ -65,7 +77,9 @@ const FloorPlans = {
       heightFt: 50,
       type: 'rectangular',
       area: 750,
-      description: 'Alternate medium bay'
+      description: "Door: 13' × 14'",
+      doorWidthFt: 13,
+      doorHeightFt: 14
     }
   ],
 

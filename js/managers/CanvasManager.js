@@ -19,6 +19,11 @@ class CanvasManager {
     this.floorPlanWidth = null; // Store floor plan dimensions for re-centering
     this.floorPlanHeight = null;
     this.isAutoFitMode = true; // Track if zoom is auto-fit vs manual
+    this.imageCache = null;
+  }
+
+  setImageCache(cache) {
+    this.imageCache = cache;
   }
 
   /**
@@ -555,17 +560,28 @@ class CanvasManager {
 
     // If image available, start async load to swap rectangle with image
     if (Config.USE_IMAGES && itemData.canvasImage) {
-      fabric.Image.fromURL(
-        itemData.canvasImage,
-        (img) => {
-          if (!img) {
-            console.warn('[CanvasManager] Failed to load image for item:', itemData.id);
-            return; // Keep rectangle fallback
-          }
-          this._swapGroupImage(group, img, itemData);
-        },
-        { crossOrigin: 'anonymous' }
-      );
+      const cachedImage = this.imageCache?.get(itemData.canvasImage);
+      if (cachedImage) {
+        const clone = cachedImage.cloneNode(true);
+        clone.crossOrigin = 'anonymous';
+        const fabricImg = new fabric.Image(clone);
+        this._swapGroupImage(group, fabricImg, itemData);
+      } else {
+        fabric.Image.fromURL(
+          itemData.canvasImage,
+          (img) => {
+            if (!img) {
+              console.warn('[CanvasManager] Failed to load image for item:', itemData.id);
+              return; // Keep rectangle fallback
+            }
+            if (this.imageCache && !this.imageCache.has(itemData.canvasImage) && img.getElement) {
+              this.imageCache.set(itemData.canvasImage, img.getElement());
+            }
+            this._swapGroupImage(group, img, itemData);
+          },
+          { crossOrigin: 'anonymous' }
+        );
+      }
     }
 
     return group;
@@ -887,7 +903,6 @@ class CanvasManager {
       this.drawFloorPlan(floorPlan);
     }
   }
-
   /**
    * Keep core canvas layers (floor plan, grid, entry zone) in correct order
    * Floor plan base (0) -> grid (1) -> entry zone fill (2) -> label (3)
@@ -912,7 +927,6 @@ class CanvasManager {
     }
   }
 }
-
 // Make available globally
 if (typeof window !== 'undefined') {
   window.CanvasManager = CanvasManager;

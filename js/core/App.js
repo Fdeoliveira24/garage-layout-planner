@@ -19,6 +19,9 @@ class App {
     // Cached DOM references for performance
     this.entryZoneWarningBadge = null;
     this.entryZoneCheckDebounce = null;
+
+    // Image preload cache
+    this.imageCache = Config.USE_IMAGES ? new Map() : null;
   }
 
   /**
@@ -33,6 +36,9 @@ class App {
 
     // Initialize canvas manager
     this.canvasManager = new CanvasManager('canvas', this.state, this.eventBus);
+    if (this.imageCache) {
+      this.canvasManager.setImageCache(this.imageCache);
+    }
     this.canvasManager.init();
 
     // Ensure viewport starts at default state
@@ -59,6 +65,11 @@ class App {
 
     // Setup autosave
     this.setupAutosave();
+
+    // Preload item images in background
+    if (this.imageCache) {
+      this.preloadItemImages();
+    }
 
     // Load last autosave if exists
     const autosaveLoaded = this.loadAutosave();
@@ -203,6 +214,28 @@ class App {
     // Zoom events
     this.eventBus.on('canvas:zoomed', (zoom) => {
       this.updateZoomDisplay(zoom);
+    });
+  }
+
+  /**
+   * Preload item canvas images for faster rendering
+   */
+  preloadItemImages() {
+    const items = Items.getAll();
+    items.forEach((item) => {
+      if (!item.canvasImage || this.imageCache.has(item.canvasImage)) {
+        return;
+      }
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        this.imageCache.set(item.canvasImage, img);
+      };
+      img.onerror = () => {
+        console.warn('[App] Failed to preload image:', item.canvasImage);
+      };
+      img.src = item.canvasImage;
     });
   }
 
@@ -408,15 +441,19 @@ class App {
     const currentId = this.state.get('floorPlan')?.id;
 
     container.innerHTML = floorPlans
-      .map(
-        (fp) => `
+      .map((fp) => {
+        const doorInfo =
+          fp.doorWidthFt && fp.doorHeightFt
+            ? `Door: ${fp.doorWidthFt}' × ${fp.doorHeightFt}'`
+            : fp.description || '';
+        return `
       <div class="floorplan-item ${currentId === fp.id ? 'selected' : ''}" data-id="${fp.id}">
         <div class="floorplan-name">${fp.name}</div>
-        <div class="floorplan-info">${fp.description}</div>
+        <div class="floorplan-info">${doorInfo}</div>
         <div class="floorplan-area">${fp.area} sq ft</div>
       </div>
-    `
-      )
+    `;
+      })
       .join('');
 
     // Add click handlers
