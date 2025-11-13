@@ -1202,20 +1202,6 @@ class App {
     const container = document.createElement('div');
     container.style.cssText = 'display: flex; flex-direction: column; gap: 16px;';
 
-    // IMPORT section
-    const importSection = document.createElement('div');
-    importSection.innerHTML = `
-      <div style="margin-bottom: 8px; color: #71717A; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
-        IMPORT
-      </div>
-      <div style="display: flex; flex-direction: column; gap: 4px;">
-        <button class="dropdown-item" data-action="import-json">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,11L16,15H13.5V18H10.5V15H8L12,11Z"/></svg>
-          Import JSON
-        </button>
-      </div>
-    `;
-
     // EXPORT section
     const exportSection = document.createElement('div');
     exportSection.innerHTML = `
@@ -1223,10 +1209,6 @@ class App {
         EXPORT
       </div>
       <div style="display: flex; flex-direction: column; gap: 4px;">
-        <button class="dropdown-item" data-action="export-json">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M5,3H7V5H5V10A2,2 0 0,1 3,12A2,2 0 0,1 5,14V19H7V21H5C3.93,20.73 3,20.1 3,19V15A2,2 0 0,0 1,13H0V11H1A2,2 0 0,0 3,9V5A2,2 0 0,1 5,3M19,3A2,2 0 0,1 21,5V9A2,2 0 0,0 23,11H24V13H23A2,2 0 0,0 21,15V19A2,2 0 0,1 19,21H17V19H19V14A2,2 0 0,1 21,12A2,2 0 0,1 19,10V5H17V3H19M12,15A1,1 0 0,1 13,16A1,1 0 0,1 12,17A1,1 0 0,1 11,16A1,1 0 0,1 12,15M8,15A1,1 0 0,1 9,16A1,1 0 0,1 8,17A1,1 0 0,1 7,16A1,1 0 0,1 8,15M16,15A1,1 0 0,1 17,16A1,1 0 0,1 16,17A1,1 0 0,1 15,16A1,1 0 0,1 16,15Z"/></svg>
-          Export JSON
-        </button>
         <button class="dropdown-item" data-action="export-png">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8.5,13.5L11,16.5L14.5,12L19,18H5M21,19V5C21,3.89 20.1,3 19,3H5A2,2 0 0,0 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19Z"/></svg>
           Export PNG
@@ -1234,6 +1216,10 @@ class App {
         <button class="dropdown-item" data-action="export-pdf">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M15.5,15C15.5,16.38 14.38,17.5 13,17.5H11.5V19H10V13H13A2.5,2.5 0 0,1 15.5,15.5M13,16.5A1,1 0 0,0 14,15.5A1,1 0 0,0 13,14.5H11.5V16.5M13,9V3.5L18.5,9"/></svg>
           Export PDF
+        </button>
+        <button class="dropdown-item" data-action="share-email">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z"/></svg>
+          Share via Email
         </button>
       </div>
     `;
@@ -1282,26 +1268,10 @@ class App {
       </div>
     `;
 
-    container.appendChild(importSection);
     container.appendChild(exportSection);
     container.appendChild(viewSection);
 
-    // Event handlers
-    // Import handler
-    container.querySelector('[data-action="import-json"]').onclick = () => {
-      const jsonFileInput = document.getElementById('json-file-input');
-      if (jsonFileInput) {
-        jsonFileInput.click();
-        Modal.close();
-      }
-    };
-
     // Export handlers
-    container.querySelector('[data-action="export-json"]').onclick = () => {
-      this.exportManager.exportJSON();
-      Modal.close();
-    };
-
     container.querySelector('[data-action="export-png"]').onclick = () => {
       Modal.close();
       this.showPNGExportDialog();
@@ -1309,6 +1279,11 @@ class App {
 
     container.querySelector('[data-action="export-pdf"]').onclick = () => {
       this.exportManager.exportPDF();
+      Modal.close();
+    };
+
+    container.querySelector('[data-action="share-email"]').onclick = () => {
+      this.shareViaEmail();
       Modal.close();
     };
 
