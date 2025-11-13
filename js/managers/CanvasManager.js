@@ -426,7 +426,6 @@ class CanvasManager {
       fill: Config.COLORS.entryZone,
       stroke: '#D32F2F',
       strokeWidth: 2,
-      strokeDashArray: [8, 4],
       selectable: false,
       evented: false,
       opacity: showEntryBorder ? 1 : 0
