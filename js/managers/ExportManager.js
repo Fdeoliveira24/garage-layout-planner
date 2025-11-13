@@ -67,10 +67,10 @@ class ExportManager {
       return;
     }
 
-    // Format: "Project Name_YYYY-MM-DD_2x.png"
+    // Format: "Project Name_YYYY-MM-DD_Buford-GA.png"
     const projectName = this.state.get('metadata.projectName') || 'Untitled Layout';
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    const filename = `${projectName}_${date}_${resolution}x.png`;
+    const filename = `${projectName}_${date}_Buford-GA.png`;
 
     const link = document.createElement('a');
     link.href = dataURL;
@@ -230,7 +230,7 @@ class ExportManager {
     // Format: "Project Name_YYYY-MM-DD.pdf"
     const projectName = this.state.get('metadata.projectName') || 'Untitled Layout';
     const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-    const filename = `${projectName}_${date}.pdf`;
+    const filename = `${projectName}_${date}_Buford-GA.pdf`;
     pdf.save(filename);
 
     console.log(`PDF exported: ${pdfOptions.format}, ${pdfOptions.orientation}, 300 DPI`);

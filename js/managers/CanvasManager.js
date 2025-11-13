@@ -13,19 +13,12 @@ class CanvasManager {
     this.floorPlanRect = null;
     this.entryZoneRect = null;
     this.entryZoneLabel = null;
-    this.entryDividerLine = null;
-    this.doorLabel = null;
     this.gridLines = [];
     this.alignmentGuides = [];
     this.emptyStateGroup = null;
     this.floorPlanWidth = null; // Store floor plan dimensions for re-centering
     this.floorPlanHeight = null;
     this.isAutoFitMode = true; // Track if zoom is auto-fit vs manual
-    this.imageCache = null;
-  }
-
-  setImageCache(cache) {
-    this.imageCache = cache;
   }
 
   /**
@@ -379,14 +372,6 @@ class CanvasManager {
     if (this.entryZoneLabel) {
       this.canvas.remove(this.entryZoneLabel);
     }
-    if (this.entryDividerLine) {
-      this.canvas.remove(this.entryDividerLine);
-      this.entryDividerLine = null;
-    }
-    if (this.doorLabel) {
-      this.canvas.remove(this.doorLabel);
-      this.doorLabel = null;
-    }
 
     const width = Helpers.feetToPx(floorPlan.widthFt);
     const height = Helpers.feetToPx(floorPlan.heightFt);
@@ -411,6 +396,7 @@ class CanvasManager {
     // Create entry zone
     const entryZonePosition = this.state.get('settings.entryZonePosition') || 'bottom';
     const showEntryBorder = this.state.get('settings.showEntryZoneBorder') !== false;
+    const showEntryLabel = this.state.get('settings.showEntryZoneLabel') !== false;
 
     let entryLeft, entryTop, entryWidth, entryHeight, labelLeft, labelTop;
 
@@ -447,7 +433,6 @@ class CanvasManager {
     });
 
     // Add entry zone label with rotation for vertical positions
-    // Note: Hide entry zone label since we now have door label
     const labelAngle = entryZonePosition === 'left' || entryZonePosition === 'right' ? 90 : 0;
 
     this.entryZoneLabel = new fabric.Text('ENTRY ZONE', {
@@ -461,46 +446,12 @@ class CanvasManager {
       angle: labelAngle,
       selectable: false,
       evented: false,
-      opacity: 0  // Hidden - we show door label instead
+      opacity: showEntryLabel ? 0.8 : 0
     });
 
     this.canvas.add(this.floorPlanRect);
     this.canvas.add(this.entryZoneRect);
     this.canvas.add(this.entryZoneLabel);
-
-    // Horizontal divider line at entry zone boundary
-    const dividerY = height - entryHeight;
-
-    this.entryDividerLine = new fabric.Line(
-      [0, dividerY, width, dividerY],
-      {
-        stroke: '#2196F3',
-        strokeWidth: 2,
-        strokeDashArray: [10, 5],
-        selectable: false,
-        evented: false
-      }
-    );
-
-    // Door label in entry zone
-    const doorWidth = floorPlan.doorWidth || 14;
-    const doorHeight = floorPlan.doorHeight || 14;
-
-    this.doorLabel = new fabric.Text(`DOOR ${doorWidth}' × ${doorHeight}'`, {
-      left: width / 2,
-      top: dividerY + entryHeight / 2,
-      fontSize: 14,
-      fill: '#1976D2',
-      fontWeight: 'bold',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
-      originX: 'center',
-      originY: 'center',
-      selectable: false,
-      evented: false
-    });
-
-    this.canvas.add(this.entryDividerLine);
-    this.canvas.add(this.doorLabel);
 
     // Draw grid if enabled
     if (this.state.get('settings.showGrid')) {
@@ -604,28 +555,17 @@ class CanvasManager {
 
     // If image available, start async load to swap rectangle with image
     if (Config.USE_IMAGES && itemData.canvasImage) {
-      const cachedImage = this.imageCache?.get(itemData.canvasImage);
-      if (cachedImage) {
-        const clone = cachedImage.cloneNode(true);
-        clone.crossOrigin = 'anonymous';
-        const fabricImg = new fabric.Image(clone);
-        this._swapGroupImage(group, fabricImg, itemData);
-      } else {
-        fabric.Image.fromURL(
-          itemData.canvasImage,
-          (img) => {
-            if (!img) {
-              console.warn('[CanvasManager] Failed to load image for item:', itemData.id);
-              return; // Keep rectangle fallback
-            }
-            if (this.imageCache && !this.imageCache.has(itemData.canvasImage) && img.getElement) {
-              this.imageCache.set(itemData.canvasImage, img.getElement());
-            }
-            this._swapGroupImage(group, img, itemData);
-          },
-          { crossOrigin: 'anonymous' }
-        );
-      }
+      fabric.Image.fromURL(
+        itemData.canvasImage,
+        (img) => {
+          if (!img) {
+            console.warn('[CanvasManager] Failed to load image for item:', itemData.id);
+            return; // Keep rectangle fallback
+          }
+          this._swapGroupImage(group, img, itemData);
+        },
+        { crossOrigin: 'anonymous' }
+      );
     }
 
     return group;
@@ -947,6 +887,7 @@ class CanvasManager {
       this.drawFloorPlan(floorPlan);
     }
   }
+
   /**
    * Keep core canvas layers (floor plan, grid, entry zone) in correct order
    * Floor plan base (0) -> grid (1) -> entry zone fill (2) -> label (3)
@@ -971,6 +912,7 @@ class CanvasManager {
     }
   }
 }
+
 // Make available globally
 if (typeof window !== 'undefined') {
   window.CanvasManager = CanvasManager;

@@ -19,9 +19,6 @@ class App {
     // Cached DOM references for performance
     this.entryZoneWarningBadge = null;
     this.entryZoneCheckDebounce = null;
-
-    // Image preload cache
-    this.imageCache = Config.USE_IMAGES ? new Map() : null;
   }
 
   /**
@@ -36,9 +33,6 @@ class App {
 
     // Initialize canvas manager
     this.canvasManager = new CanvasManager('canvas', this.state, this.eventBus);
-    if (this.imageCache) {
-      this.canvasManager.setImageCache(this.imageCache);
-    }
     this.canvasManager.init();
 
     // Ensure viewport starts at default state
@@ -65,11 +59,6 @@ class App {
 
     // Setup autosave
     this.setupAutosave();
-
-    // Preload item images in background
-    if (this.imageCache) {
-      this.preloadItemImages();
-    }
 
     // Load last autosave if exists
     const autosaveLoaded = this.loadAutosave();
@@ -214,28 +203,6 @@ class App {
     // Zoom events
     this.eventBus.on('canvas:zoomed', (zoom) => {
       this.updateZoomDisplay(zoom);
-    });
-  }
-
-  /**
-   * Preload item canvas images for faster rendering
-   */
-  preloadItemImages() {
-    const items = Items.getAll();
-    items.forEach((item) => {
-      if (!item.canvasImage || this.imageCache.has(item.canvasImage)) {
-        return;
-      }
-
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        this.imageCache.set(item.canvasImage, img);
-      };
-      img.onerror = () => {
-        console.warn('[App] Failed to preload image:', item.canvasImage);
-      };
-      img.src = item.canvasImage;
     });
   }
 
@@ -441,20 +408,15 @@ class App {
     const currentId = this.state.get('floorPlan')?.id;
 
     container.innerHTML = floorPlans
-      .map((fp) => {
-        const doorInfo =
-          fp.doorWidth && fp.doorHeight
-            ? `Door: ${fp.doorWidth}' × ${fp.doorHeight}'`
-            : fp.description || '';
-        const area = fp.area || (fp.widthFt * fp.heightFt);
-        return `
+      .map(
+        (fp) => `
       <div class="floorplan-item ${currentId === fp.id ? 'selected' : ''}" data-id="${fp.id}">
         <div class="floorplan-name">${fp.name}</div>
-        <div class="floorplan-info">${doorInfo}</div>
-        <div class="floorplan-area">${area} sq ft</div>
+        <div class="floorplan-info">${fp.description}</div>
+        <div class="floorplan-area">${fp.area} sq ft</div>
       </div>
-    `;
-      })
+    `
+      )
       .join('');
 
     // Add click handlers
@@ -630,13 +592,19 @@ class App {
     // Export PNG
     const exportPngBtn = document.getElementById('btn-export-png');
     if (exportPngBtn) {
-      exportPngBtn.addEventListener('click', () => this.exportManager.exportPNG(2));
+      exportPngBtn.addEventListener('click', () => this.exportManager.exportPNG(4));
     }
 
     // Export PDF
     const exportPdfBtn = document.getElementById('btn-export-pdf');
     if (exportPdfBtn) {
       exportPdfBtn.addEventListener('click', () => this.exportManager.exportPDF());
+    }
+
+    // Share via Email
+    const shareEmailBtn = document.getElementById('btn-share-email');
+    if (shareEmailBtn) {
+      shareEmailBtn.addEventListener('click', () => this.shareViaEmail());
     }
 
     // Import JSON
@@ -1668,6 +1636,52 @@ class App {
     } else {
       Modal.showError('Failed to save layout - storage error');
     }
+  }
+
+  /**
+   * Share layout via email
+   */
+  shareViaEmail() {
+    const floorPlan = this.state.get('floorPlan');
+    const items = this.state.get('items') || [];
+    const metadata = this.state.get('metadata') || {};
+    const projectName = metadata.projectName || 'Untitled Layout';
+
+    if (!floorPlan) {
+      Modal.showError('Please select a floor plan first');
+      return;
+    }
+
+    // Calculate area
+    const areaSqFt = floorPlan.widthFt * floorPlan.heightFt;
+
+    // Format door dimensions - check both key formats
+    const doorWidth = floorPlan.doorWidth ?? floorPlan.doorWidthFt;
+    const doorHeight = floorPlan.doorHeight ?? floorPlan.doorHeightFt;
+    const doorInfo = doorWidth && doorHeight ? `${doorWidth}' × ${doorHeight}'` : 'N/A';
+
+    // Create email content
+    const subject = encodeURIComponent(`Storage CavesGarage Layout: ${projectName}`);
+
+    const layoutInfo = `
+Location: ${metadata.location || 'Buford, GA'}
+Floor Plan: ${floorPlan.name}
+Door: ${doorInfo}
+Area: ${areaSqFt} sq ft
+Items: ${items.length}
+
+Item List:
+${items.map((item, i) => `${i + 1}. ${item.label} - ${item.lengthFt}' × ${item.widthFt}'`).join('\n')}
+
+Occupancy: ${this.floorPlanManager.getOccupancyPercentage().toFixed(1)}%
+    `.trim();
+
+    const body = encodeURIComponent(
+      `Hi,\n\nI'd like to share my garage layout plan with you:\n\n${layoutInfo}\n\n---\nCreated with Storage Caves Garage Layout Planner`
+    );
+
+    // Open default email client
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }
 
   /**
