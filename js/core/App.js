@@ -174,6 +174,10 @@ class App {
       this.updateInfoPanel();
     });
 
+    this.eventBus.on('canvas:selection:updated', () => {
+      this.updateInfoPanel();
+    });
+
     this.eventBus.on('canvas:selection:cleared', () => {
       this.updateInfoPanel();
     });
@@ -362,6 +366,13 @@ class App {
       entryBorderToggleText.textContent = showEntryBorder
         ? 'Hide Entry Border'
         : 'Show Entry Border';
+    }
+
+    // Update labels toggle text
+    const showItemLabels = this.state.get('settings.showItemLabels') !== false;
+    const labelsToggleText = document.getElementById('labels-toggle-text');
+    if (labelsToggleText) {
+      labelsToggleText.textContent = showItemLabels ? 'Hide Labels' : 'Show Labels';
     }
   }
 
@@ -734,6 +745,18 @@ class App {
         document.getElementById('entry-border-toggle-text').textContent = showBorder
           ? 'Show Entry Border'
           : 'Hide Entry Border';
+      });
+    }
+
+    const toggleLabelsBtn = document.getElementById('btn-toggle-labels');
+    if (toggleLabelsBtn) {
+      toggleLabelsBtn.addEventListener('click', () => {
+        const showLabels = this.state.get('settings.showItemLabels') !== false;
+        this.state.set('settings.showItemLabels', !showLabels);
+        document.getElementById('labels-toggle-text').textContent = showLabels
+          ? 'Show Labels'
+          : 'Hide Labels';
+        this.canvasManager.toggleItemLabels(!showLabels);
       });
     }
   }
@@ -1230,6 +1253,7 @@ class App {
     const gridVisible = currentSettings.showGrid !== false;
     const entryLabelVisible = currentSettings.showEntryLabel !== false;
     const entryBorderVisible = currentSettings.showEntryBorder !== false;
+    const itemLabelsVisible = currentSettings.showItemLabels !== false;
     const entryPosition = currentSettings.entryZonePosition || 'bottom';
 
     viewSection.innerHTML = `
@@ -1240,6 +1264,10 @@ class App {
         <button class="dropdown-item" data-action="toggle-grid">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M10,4V8H14V4H10M16,4V8H20V4H16M16,10V14H20V10H16M16,16V20H20V16H16M14,20V16H10V20H14M8,20V16H4V20H8M8,14V10H4V14H8M8,8V4H4V8H8M10,14H14V10H10V14M4,2H20A2,2 0 0,1 22,4V20A2,2 0 0,1 20,22H4C2.89,22 2,21.1 2,20V4A2,2 0 0,1 4,2Z"/></svg>
           ${gridVisible ? 'Hide' : 'Show'} Grid
+        </button>
+        <button class="dropdown-item" data-action="toggle-item-labels">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8,9H16V11H8V9M4,3H20A2,2 0 0,1 22,5V19A2,2 0 0,1 20,21H4A2,2 0 0,1 2,19V5A2,2 0 0,1 4,3Z" /></svg>
+          ${itemLabelsVisible ? 'Hide' : 'Show'} Labels
         </button>
         <button class="dropdown-item" data-action="toggle-entry-label">
           <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M9.62,12L12,5.67L14.37,12M11,3L5.5,17H7.75L8.87,14H15.12L16.25,17H18.5L13,3H11Z"/></svg>
@@ -1289,6 +1317,13 @@ class App {
 
     container.querySelector('[data-action="toggle-grid"]').onclick = () => {
       this.canvasManager.toggleGrid();
+      Modal.close();
+    };
+
+    container.querySelector('[data-action="toggle-item-labels"]').onclick = () => {
+      const showLabels = this.state.get('settings.showItemLabels') !== false;
+      this.state.set('settings.showItemLabels', !showLabels);
+      this.canvasManager.toggleItemLabels(!showLabels);
       Modal.close();
     };
 
@@ -1403,6 +1438,10 @@ class App {
 
       // Final render
       this.canvasManager.getCanvas().renderAll();
+
+      // Apply label visibility setting
+      const showLabels = this.state.get('settings.showItemLabels') !== false;
+      this.canvasManager.toggleItemLabels(showLabels);
     } else {
       // No floor plan - show empty state
       this.canvasManager.showEmptyState();
@@ -1550,6 +1589,10 @@ class App {
 
       // Render canvas
       this.canvasManager.getCanvas().renderAll();
+
+      // Apply label visibility setting
+      const showLabels = this.state.get('settings.showItemLabels') !== false;
+      this.canvasManager.toggleItemLabels(showLabels);
 
       // Sync project name from loaded state to UI
       this.updateProjectName(savedState.metadata?.projectName);

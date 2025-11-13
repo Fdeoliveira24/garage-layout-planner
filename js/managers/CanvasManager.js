@@ -19,6 +19,7 @@ class CanvasManager {
     this.floorPlanWidth = null; // Store floor plan dimensions for re-centering
     this.floorPlanHeight = null;
     this.isAutoFitMode = true; // Track if zoom is auto-fit vs manual
+    this.itemLabels = []; // Track all item labels for visibility toggling
   }
 
   /**
@@ -652,6 +653,20 @@ class CanvasManager {
       mtr: true
     });
 
+    group.label = label;
+
+    // Track label for visibility toggling
+    this.itemLabels.push(label);
+
+    const keepLabelUpright = () => {
+      if (!group.label) return;
+      group.label.set('angle', -group.angle);
+      group.label.setCoords();
+    };
+
+    group.on('rotating', keepLabelUpright);
+    group.on('rotated', keepLabelUpright);
+
     // Store custom data on group
     group.customData = { ...itemData };
 
@@ -744,6 +759,7 @@ class CanvasManager {
     this.emptyStateGroup = null;
     this.floorPlanWidth = null;
     this.floorPlanHeight = null;
+    this.itemLabels = []; // Clear tracked labels
   }
 
   /**
@@ -876,6 +892,34 @@ class CanvasManager {
       }
       this.canvas.renderAll();
     }
+  }
+
+  /**
+   * Toggle item labels visibility
+   */
+  toggleItemLabels(show) {
+    // Update all existing item labels
+    const objects = this.canvas.getObjects();
+    objects.forEach((obj) => {
+      if (obj.type === 'group' && obj.label) {
+        obj.label.set({
+          visible: show,
+          opacity: show ? 1 : 0
+        });
+        obj.label.setCoords();
+      }
+    });
+
+    // Update tracked labels array
+    this.itemLabels.forEach((label) => {
+      label.set({
+        visible: show,
+        opacity: show ? 1 : 0
+      });
+      label.setCoords();
+    });
+
+    this.canvas.requestRenderAll();
   }
 
   /**
