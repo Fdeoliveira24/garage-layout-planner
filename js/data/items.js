@@ -125,7 +125,7 @@ const Items = {
         },
         {
           id: 'golf-cart',
-          label: 'Electric Golf Cart',
+          label: 'Golf Cart',
           lengthFt: 8,
           widthFt: 4,
           color: '#90CAF9',
