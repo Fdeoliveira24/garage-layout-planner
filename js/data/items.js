@@ -199,38 +199,38 @@ const Items = {
           canvasImage: 'assets/images/items/canvas/freezer-top.png'
         },
         {
-          id: 'ladder-rack',
-          label: 'Ladder Rack',
+          id: 'scaffold-rack',
+          label: 'Scaffold Rack',
           lengthFt: 8,
           widthFt: 1.5,
           color: '#FFA726',
           category: 'storage',
-          paletteImage: 'assets/images/items/palette/ladder-rack-side.png',
-          canvasImage: 'assets/images/items/canvas/ladder-rack-top.png'
+          paletteImage: 'assets/images/items/palette/scaffold-side.png',
+          canvasImage: 'assets/images/items/canvas/scaffold-top.png'
         },
         {
-          id: 'pegboard',
-          label: 'Pegboard',
-          lengthFt: 4,
-          widthFt: 0.5,
+          id: 'kayak',
+          label: 'Kayak',
+          lengthFt: 12,
+          widthFt: 2.8,
           color: '#A1887F',
           category: 'storage',
-          paletteImage: 'assets/images/items/palette/pegboard-side.png',
-          canvasImage: 'assets/images/items/canvas/pegboard-top.png'
+          paletteImage: 'assets/images/items/palette/kayak-side.png',
+          canvasImage: 'assets/images/items/canvas/kayak-top.png'
         },
         {
-          id: 'small-shelf',
-          label: 'Small Shelf',
+          id: 'small-tool-box',
+          label: 'Tool Box',
           lengthFt: 3,
           widthFt: 1.5,
           color: '#90A4AE',
           category: 'storage',
-          paletteImage: 'assets/images/items/palette/small-shelf-side.png',
-          canvasImage: 'assets/images/items/canvas/small-shelf-top.png'
+          paletteImage: 'assets/images/items/palette/small-tool-box-side.png',
+          canvasImage: 'assets/images/items/canvas/small-tool-box-top.png'
         },
         {
           id: 'car-lift',
-          label: 'Four Post Car Lift',
+          label: 'Car Lift',
           lengthFt: 15,
           widthFt: 9,
           color: '#EF5350',
